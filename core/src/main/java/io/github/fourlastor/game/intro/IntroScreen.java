@@ -9,32 +9,46 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.fourlastor.game.di.modules.AssetsModule;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
+import io.github.fourlastor.ldtk.model.LdtkMapData;
+import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
+
 import javax.inject.Inject;
 
 public class IntroScreen extends ScreenAdapter {
 
-    public static final Color CLEAR_COLOR = Color.valueOf("000000");
+    public static final Color CLEAR_COLOR = Color.valueOf("cccccc");
 
     private final InputMultiplexer inputMultiplexer;
     private final Stage stage;
     private final Viewport viewport;
     private final AnimationStateMachine animationGroup;
+    private final OrthographicCamera camera;
 
     @Inject
-    public IntroScreen(InputMultiplexer inputMultiplexer, AssetManager assetManager) {
+    public IntroScreen(InputMultiplexer inputMultiplexer, AssetManager assetManager, TextureAtlas atlas) {
         this.inputMultiplexer = inputMultiplexer;
 
-        viewport = new FitViewport(256, 144);
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(16, 9, camera);
         stage = new Stage(viewport);
+        LdtkMapParser mapParser = new LdtkMapParser(atlas, "tiles");
+        LdtkMapData definition = assetManager.get(AssetsModule.PATH_LEVELS);
+        WidgetGroup tilesGroup = mapParser.parse(definition.levels.get(0), definition.defs);
+        stage.addActor(tilesGroup);
 
         AnimationNode.Group node =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         animationGroup = new AnimationStateMachine(node);
+        animationGroup.setScale(1f/16f);
         stage.addActor(animationGroup);
     }
 
@@ -64,10 +78,12 @@ public class IntroScreen extends ScreenAdapter {
                     animationGroup.enter("run");
                     return true;
                 case Input.Keys.D:
-//                    animationGroup.enter("skip");
+                    camera.zoom *= 2;
+                    camera.update();
                     return true;
                 case Input.Keys.F:
-//                    animationGroup.enter("slide");
+                    camera.zoom /= 2;
+                    camera.update();
                     return true;
                 case Input.Keys.G:
 //                    animationGroup.enter("snap");

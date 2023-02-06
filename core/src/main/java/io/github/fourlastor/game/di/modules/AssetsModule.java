@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 public class AssetsModule {
 
     private static final String PATH_TEXTURE_ATLAS = "images/included/packed/images.pack.atlas";
-    private static final String PATH_LEVELS = "maps/levels.ldtk";
+    public static final String PATH_LEVELS = "maps/levels.ldtk";
     private static final String PATH_DEFAULT_SHADER = "shaders/default.vs";
     private static final String PATH_WAVE_SHADER = "shaders/wave.fs";
     public static final String WHITE_PIXEL = "white-pixel";
