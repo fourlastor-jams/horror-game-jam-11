@@ -79,10 +79,16 @@ public class IntroScreen extends ScreenAdapter {
                     animationGroup.enter("run");
                     return true;
                 case Input.Keys.D:
+                    animationGroup.enter("jump");
+                    return true;
+                case Input.Keys.F:
+                    animationGroup.enter("fall");
+                    return true;
+                case Input.Keys.Q:
                     camera.zoom *= 2;
                     camera.update();
                     return true;
-                case Input.Keys.F:
+                case Input.Keys.W:
                     camera.zoom /= 2;
                     camera.update();
                     return true;
