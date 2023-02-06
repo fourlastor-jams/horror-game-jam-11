@@ -99,6 +99,10 @@ public class DragonBonesAnimationsParser {
                     durationMs += displayFrame.duration * 1000 / 60;
                 }
 
+                if (durationMs == 0) {
+                    durationMs = 1;
+                }
+
                 animations.put(
                         animation.name, new KeyFrameAnimation<>(frames, durationMs / 1000f, Animation.PlayMode.LOOP));
             }
