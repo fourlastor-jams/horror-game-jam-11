@@ -48,7 +48,7 @@ public class IntroScreen extends ScreenAdapter {
         AnimationNode.Group node =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         animationGroup = new AnimationStateMachine(node);
-        animationGroup.setScale(1f/16f);
+        animationGroup.setScale(1f/32f);
         stage.addActor(animationGroup);
     }
 
