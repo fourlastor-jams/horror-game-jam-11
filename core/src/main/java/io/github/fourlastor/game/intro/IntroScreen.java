@@ -20,7 +20,6 @@ import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 import io.github.fourlastor.ldtk.model.LdtkMapData;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
-
 import javax.inject.Inject;
 
 public class IntroScreen extends ScreenAdapter {
@@ -48,7 +47,7 @@ public class IntroScreen extends ScreenAdapter {
         AnimationNode.Group node =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         animationGroup = new AnimationStateMachine(node);
-        animationGroup.setScale(1f/32f);
+        animationGroup.setScale(1f / 32f);
         stage.addActor(animationGroup);
     }
 
@@ -86,7 +85,7 @@ public class IntroScreen extends ScreenAdapter {
                     camera.update();
                     return true;
                 case Input.Keys.G:
-//                    animationGroup.enter("snap");
+                    //                    animationGroup.enter("snap");
                     return true;
             }
             return false;

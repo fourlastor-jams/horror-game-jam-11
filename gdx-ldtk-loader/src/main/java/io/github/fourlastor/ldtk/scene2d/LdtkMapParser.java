@@ -10,7 +10,6 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetCustomData;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,8 @@ public class LdtkMapParser {
 
     public WidgetGroup parse(LdtkLevelDefinition definition, LdtkDefinitions definitions) {
         WidgetGroup layers = new WidgetGroup();
-        List<LdtkLayerInstance> layerInstances = definition.layerInstances == null ? new ArrayList<>() : definition.layerInstances;
+        List<LdtkLayerInstance> layerInstances =
+                definition.layerInstances == null ? new ArrayList<>() : definition.layerInstances;
         for (LdtkLayerInstance layerInstance : layerInstances) {
             if (!"AutoLayer".equals(layerInstance.type)) {
                 continue;
@@ -41,7 +41,7 @@ public class LdtkMapParser {
                 Image tile = new Image(getAtlasRegion(tileName, tileInstance.flipX(), tileInstance.flipY()));
 
                 tile.setPosition(tileInstance.x() / 16f, layerInstance.cHei - tileInstance.y() / 16f);
-                tile.setScale(1f/16f);
+                tile.setScale(1f / 16f);
                 layer.addActor(tile);
             }
             layers.addActor(layer);
