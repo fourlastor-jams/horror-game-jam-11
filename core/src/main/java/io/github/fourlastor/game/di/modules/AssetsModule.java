@@ -28,7 +28,7 @@ public class AssetsModule {
     private static final String PATH_WAVE_SHADER = "shaders/wave.fs";
     public static final String WHITE_PIXEL = "white-pixel";
     private static final String PATH_SPINE_JSON = "animations/animation_spine.json";
-    private static final String PATH_DRAGON_BONES_JSON = "images/included/animations/dancer/dancer.json";
+    private static final String CHARACTER_ANIMATION_PATH = "images/included/animations/character/character.json";
 
     @Provides
     public DragonBonesLoader dragonBonesLoader(JsonReader json, JsonParser<DragonBonesEntity> parser) {
@@ -51,7 +51,7 @@ public class AssetsModule {
         assetManager.load(PATH_TEXTURE_ATLAS, TextureAtlas.class);
         assetManager.load(PATH_LEVELS, LdtkMapData.class);
         assetManager.load(PATH_SPINE_JSON, SpineEntity.class);
-        assetManager.load(PATH_DRAGON_BONES_JSON, AnimationNode.Group.class);
+        assetManager.load(CHARACTER_ANIMATION_PATH, AnimationNode.Group.class);
         assetManager.load(PATH_DEFAULT_SHADER, Text.class);
         assetManager.load(PATH_WAVE_SHADER, Text.class);
         assetManager.finishLoading();

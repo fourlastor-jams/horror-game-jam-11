@@ -33,7 +33,7 @@ public class IntroScreen extends ScreenAdapter {
         stage = new Stage(viewport);
 
         AnimationNode.Group node =
-                assetManager.get("images/included/animations/dancer/dancer.json", AnimationNode.Group.class);
+                assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         animationGroup = new AnimationStateMachine(node);
         stage.addActor(animationGroup);
     }
@@ -58,19 +58,19 @@ public class IntroScreen extends ScreenAdapter {
         public boolean keyUp(int keycode) {
             switch (keycode) {
                 case Input.Keys.A:
-                    animationGroup.enter("balancing");
+                    animationGroup.enter("idle");
                     return true;
                 case Input.Keys.S:
-                    animationGroup.enter("hips");
+                    animationGroup.enter("run");
                     return true;
                 case Input.Keys.D:
-                    animationGroup.enter("skip");
+//                    animationGroup.enter("skip");
                     return true;
                 case Input.Keys.F:
-                    animationGroup.enter("slide");
+//                    animationGroup.enter("slide");
                     return true;
                 case Input.Keys.G:
-                    animationGroup.enter("snap");
+//                    animationGroup.enter("snap");
                     return true;
             }
             return false;
