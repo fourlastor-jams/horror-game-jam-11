@@ -58,7 +58,9 @@ public class DragonBonesLoader
     @Override
     public Array<AssetDescriptor> getDependencies(
             String fileName, FileHandle file, AssetLoaderParameters<AnimationNode.Group> parameter) {
-        return Array.with(new AssetDescriptor<>(atlasPath, TextureAtlas.class));
+        Array<AssetDescriptor> descriptors = new Array<>();
+        descriptors.add(new AssetDescriptor(atlasPath, TextureAtlas.class));
+        return descriptors;
     }
 
     public static class Options {
