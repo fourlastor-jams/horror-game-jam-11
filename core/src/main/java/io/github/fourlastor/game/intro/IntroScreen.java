@@ -25,6 +25,8 @@ import javax.inject.Inject;
 public class IntroScreen extends ScreenAdapter {
 
     public static final Color CLEAR_COLOR = Color.valueOf("cccccc");
+    private static final float SCALE = 1f / 16f;
+    private static final float CHARACTER_SCALE = SCALE / 2;
 
     private final InputMultiplexer inputMultiplexer;
     private final Stage stage;
@@ -39,7 +41,7 @@ public class IntroScreen extends ScreenAdapter {
         camera = new OrthographicCamera();
         viewport = new FitViewport(16, 9, camera);
         stage = new Stage(viewport);
-        LdtkMapParser mapParser = new LdtkMapParser(atlas, "tiles");
+        LdtkMapParser mapParser = new LdtkMapParser(atlas, "tiles", SCALE);
         LdtkMapData definition = assetManager.get(AssetsModule.PATH_LEVELS);
         WidgetGroup tilesGroup = mapParser.parse(definition.levels.get(0), definition.defs);
         stage.addActor(tilesGroup);
@@ -47,7 +49,7 @@ public class IntroScreen extends ScreenAdapter {
         AnimationNode.Group node =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         animationGroup = new AnimationStateMachine(node);
-        animationGroup.setScale(1f / 32f);
+        animationGroup.setScale(CHARACTER_SCALE);
         stage.addActor(animationGroup);
     }
 

@@ -19,10 +19,12 @@ public class LdtkMapParser {
     private final TextureAtlas atlas;
     private final String basePath;
     private final HashMap<String, TextureRegion> tilesCache = new HashMap<>();
+    private final float scale;
 
-    public LdtkMapParser(TextureAtlas atlas, String basePath) {
+    public LdtkMapParser(TextureAtlas atlas, String basePath, float scale) {
         this.atlas = atlas;
         this.basePath = basePath;
+        this.scale = scale;
     }
 
     public WidgetGroup parse(LdtkLevelDefinition definition, LdtkDefinitions definitions) {
@@ -41,7 +43,7 @@ public class LdtkMapParser {
                 Image tile = new Image(getAtlasRegion(tileName, tileInstance.flipX(), tileInstance.flipY()));
 
                 tile.setPosition(tileInstance.x() / 16f, layerInstance.cHei - tileInstance.y() / 16f);
-                tile.setScale(1f / 16f);
+                tile.setScale(scale);
                 layer.addActor(tile);
             }
             layers.addActor(layer);
