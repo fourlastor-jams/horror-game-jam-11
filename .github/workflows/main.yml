@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     env:
-      ITCH_PROJECT: 'fourlastor/gdx-java-base'
+      ITCH_PROJECT: 'fourlastor/rebirth'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
