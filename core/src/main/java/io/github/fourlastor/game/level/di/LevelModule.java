@@ -11,15 +11,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
-import io.github.fourlastor.game.level.blueprint.ChunkSpawnSystem;
+import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.input.PlayerInputSystem;
 import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
 import io.github.fourlastor.game.level.physics.PhysicsSystem;
 import io.github.fourlastor.game.level.system.ActorFollowBodySystem;
 import io.github.fourlastor.game.level.system.CameraMovementSystem;
 import io.github.fourlastor.game.level.system.ClearScreenSystem;
-import io.github.fourlastor.game.level.system.FishSpawnSystem;
-import io.github.fourlastor.game.level.system.GameOverSystem;
 import io.github.fourlastor.game.level.system.GarbageCollectionSystem;
 import io.github.fourlastor.game.level.system.MovingSystem;
 import io.github.fourlastor.game.level.system.SoundSystem;
@@ -39,15 +37,10 @@ public class LevelModule {
             ClearScreenSystem clearScreenSystem,
             @SuppressWarnings("unused") // debug only
                     PhysicsDebugSystem physicsDebugSystem,
-            ChunkSpawnSystem chunkSpawnSystem,
-            GameOverSystem gameOverSystem,
             MovingSystem movingSystem,
             SoundSystem soundSystem,
-            FishSpawnSystem fishSpawnSystem,
             GarbageCollectionSystem garbageCollectionSystem) {
         Engine engine = new Engine();
-        engine.addSystem(chunkSpawnSystem);
-        engine.addSystem(fishSpawnSystem);
         engine.addSystem(movingSystem);
         engine.addSystem(playerInputSystem);
         engine.addSystem(physicsSystem);
@@ -56,7 +49,6 @@ public class LevelModule {
         engine.addSystem(actorFollowBodySystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        engine.addSystem(gameOverSystem);
         engine.addSystem(garbageCollectionSystem);
         //        engine.addSystem(physicsDebugSystem);
         return engine;
@@ -64,8 +56,8 @@ public class LevelModule {
 
     @Provides
     @ScreenScoped
-    public Viewport viewport() {
-        return new FitViewport(9f, 16f);
+    public Viewport viewport(GameConfig config) {
+        return new FitViewport(config.width, config.height);
     }
 
     @Provides
@@ -97,5 +89,10 @@ public class LevelModule {
     @ScreenScoped
     public MessageDispatcher messageDispatcher() {
         return new MessageDispatcher();
+    }
+
+    @Provides
+    public GameConfig worldConfig() {
+        return new GameConfig(16f, 9f, 1f / 16f);
     }
 }

@@ -25,6 +25,8 @@ public interface LevelComponent {
 
         Builder router(RouterModule routerModule);
 
+        Builder map(MapModule mapModule);
+
         LevelComponent build();
     }
 }

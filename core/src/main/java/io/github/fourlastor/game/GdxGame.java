@@ -5,9 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import io.github.fourlastor.game.di.GameComponent;
-import io.github.fourlastor.game.gameover.GameOverComponent;
 import io.github.fourlastor.game.intro.IntroComponent;
 import io.github.fourlastor.game.level.di.LevelComponent;
+import io.github.fourlastor.game.level.di.MapModule;
 import io.github.fourlastor.game.route.Router;
 import io.github.fourlastor.game.route.RouterModule;
 
@@ -17,25 +17,22 @@ public class GdxGame extends Game implements Router {
 
     private final LevelComponent.Builder levelScreenFactory;
     private final IntroComponent.Builder introScreenFactory;
-    private final GameOverComponent.Builder gameOverFactory;
 
     private Screen pendingScreen = null;
 
     public GdxGame(
             InputMultiplexer multiplexer,
             LevelComponent.Builder levelScreenFactory,
-            IntroComponent.Builder introScreenFactory,
-            GameOverComponent.Builder gameOverFactory) {
+            IntroComponent.Builder introScreenFactory) {
         this.multiplexer = multiplexer;
         this.levelScreenFactory = levelScreenFactory;
         this.introScreenFactory = introScreenFactory;
-        this.gameOverFactory = gameOverFactory;
     }
 
     @Override
     public void create() {
         Gdx.input.setInputProcessor(multiplexer);
-        goToIntro();
+        goToLevel(0);
     }
 
     @Override
@@ -58,13 +55,11 @@ public class GdxGame extends Game implements Router {
     }
 
     @Override
-    public void goToLevel() {
-        pendingScreen =
-                levelScreenFactory.router(new RouterModule(this)).build().screen();
-    }
-
-    @Override
-    public void goToGameOver() {
-        pendingScreen = gameOverFactory.router(new RouterModule(this)).build().screen();
+    public void goToLevel(int levelIndex) {
+        pendingScreen = levelScreenFactory
+                .router(new RouterModule(this))
+                .map(new MapModule(levelIndex))
+                .build()
+                .screen();
     }
 }
