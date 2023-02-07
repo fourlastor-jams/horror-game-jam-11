@@ -11,14 +11,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
-import io.github.fourlastor.game.level.blueprint.ChunkSpawnSystem;
+import io.github.fourlastor.game.level.WorldConfig;
 import io.github.fourlastor.game.level.input.PlayerInputSystem;
 import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
 import io.github.fourlastor.game.level.physics.PhysicsSystem;
 import io.github.fourlastor.game.level.system.ActorFollowBodySystem;
 import io.github.fourlastor.game.level.system.CameraMovementSystem;
 import io.github.fourlastor.game.level.system.ClearScreenSystem;
-import io.github.fourlastor.game.level.system.FishSpawnSystem;
 import io.github.fourlastor.game.level.system.GameOverSystem;
 import io.github.fourlastor.game.level.system.GarbageCollectionSystem;
 import io.github.fourlastor.game.level.system.MovingSystem;
@@ -39,15 +38,11 @@ public class LevelModule {
             ClearScreenSystem clearScreenSystem,
             @SuppressWarnings("unused") // debug only
                     PhysicsDebugSystem physicsDebugSystem,
-            ChunkSpawnSystem chunkSpawnSystem,
             GameOverSystem gameOverSystem,
             MovingSystem movingSystem,
             SoundSystem soundSystem,
-            FishSpawnSystem fishSpawnSystem,
             GarbageCollectionSystem garbageCollectionSystem) {
         Engine engine = new Engine();
-        engine.addSystem(chunkSpawnSystem);
-        engine.addSystem(fishSpawnSystem);
         engine.addSystem(movingSystem);
         engine.addSystem(playerInputSystem);
         engine.addSystem(physicsSystem);
@@ -97,5 +92,10 @@ public class LevelModule {
     @ScreenScoped
     public MessageDispatcher messageDispatcher() {
         return new MessageDispatcher();
+    }
+
+    @Provides
+    public WorldConfig worldConfig() {
+        return new WorldConfig(16f, 9f, 13f / 256f);
     }
 }
