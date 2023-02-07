@@ -51,7 +51,7 @@ public class LdtkMapParser {
         String tileName = basePath + "/" + customData.data;
         Image tile = new Image(getAtlasRegion(tileName, tileInstance.flipX(), tileInstance.flipY()));
 
-        tile.setPosition(tileInstance.x() / 16f, layerInstance.cHei - tileInstance.y() / 16f);
+        tile.setPosition(tileInstance.x() * scale, layerInstance.cHei - tileInstance.y() * scale);
         tile.setScale(scale);
         return tile;
     }
