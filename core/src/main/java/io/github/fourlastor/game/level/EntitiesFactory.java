@@ -68,7 +68,7 @@ public class EntitiesFactory {
                     BodyDef def = new BodyDef();
                     def.position.set(
                             tileInstance.x() * config.scale,
-                            layerInstance.cHei - tileInstance.y() * config.scale
+                            tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * config.scale
                     ).add(centerAdjust, centerAdjust);
                     def.type = BodyDef.BodyType.StaticBody;
                     Body body = world.createBody(def);
