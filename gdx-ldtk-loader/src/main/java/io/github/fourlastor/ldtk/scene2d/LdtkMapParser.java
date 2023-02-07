@@ -38,17 +38,22 @@ public class LdtkMapParser {
             WidgetGroup layer = new WidgetGroup();
             LdtkTilesetDefinition tileset = definitions.tileset(layerInstance.tilesetDefUid);
             for (LdtkTileInstance tileInstance : layerInstance.autoLayerTiles) {
-                LdtkTilesetCustomData customData = tileset.customData(tileInstance.t);
-                String tileName = basePath + "/" + customData.data;
-                Image tile = new Image(getAtlasRegion(tileName, tileInstance.flipX(), tileInstance.flipY()));
-
-                tile.setPosition(tileInstance.x() / 16f, layerInstance.cHei - tileInstance.y() / 16f);
-                tile.setScale(scale);
+                Image tile = tile(layerInstance, tileset, tileInstance);
                 layer.addActor(tile);
             }
             layers.addActor(layer);
         }
         return layers;
+    }
+
+    public Image tile(LdtkLayerInstance layerInstance, LdtkTilesetDefinition tileset, LdtkTileInstance tileInstance) {
+        LdtkTilesetCustomData customData = tileset.customData(tileInstance.t);
+        String tileName = basePath + "/" + customData.data;
+        Image tile = new Image(getAtlasRegion(tileName, tileInstance.flipX(), tileInstance.flipY()));
+
+        tile.setPosition(tileInstance.x() / 16f, layerInstance.cHei - tileInstance.y() / 16f);
+        tile.setScale(scale);
+        return tile;
     }
 
     private TextureRegion getAtlasRegion(String tileName, boolean flipX, boolean flipY) {
