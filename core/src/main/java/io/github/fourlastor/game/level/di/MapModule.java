@@ -11,9 +11,7 @@ import io.github.fourlastor.ldtk.model.LdtkMapData;
 @Module
 public class MapModule {
 
-
     private final int levelIndex;
-
 
     public MapModule(int levelIndex) {
         this.levelIndex = levelIndex;

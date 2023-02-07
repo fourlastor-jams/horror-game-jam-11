@@ -15,9 +15,7 @@ public class GameModule {
     @Provides
     @Singleton
     public GdxGame game(
-            InputMultiplexer multiplexer,
-            LevelComponent.Builder levelBuilder,
-            IntroComponent.Builder introBuilder) {
+            InputMultiplexer multiplexer, LevelComponent.Builder levelBuilder, IntroComponent.Builder introBuilder) {
         return new GdxGame(multiplexer, levelBuilder, introBuilder);
     }
 

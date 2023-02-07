@@ -1,6 +1,5 @@
 package io.github.fourlastor.game.level.physics;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -8,8 +7,6 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -17,12 +14,9 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
-import io.github.fourlastor.game.level.Message;
-import io.github.fourlastor.game.level.UserData;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import javax.inject.Inject;
-import java.util.List;
 
 public class PhysicsSystem extends IntervalSystem {
 
@@ -132,9 +126,7 @@ public class PhysicsSystem extends IntervalSystem {
         }
 
         @Override
-        public void endContact(Contact contact) {
-
-        }
+        public void endContact(Contact contact) {}
 
         @Override
         public void preSolve(Contact contact, Manifold oldManifold) {
@@ -146,9 +138,7 @@ public class PhysicsSystem extends IntervalSystem {
         }
 
         @Override
-        public void postSolve(Contact contact, ContactImpulse impulse) {
-
-        }
+        public void postSolve(Contact contact, ContactImpulse impulse) {}
     };
 
     private void propagateHit(@SuppressWarnings("unused") Fixture hitbox, Fixture hurtbox) {
@@ -159,10 +149,10 @@ public class PhysicsSystem extends IntervalSystem {
         }
         Entity hurt = (Entity) hurtUserData;
         Entity hit = (Entity) hitUserData;
-//
-//        messageDispatcher.dispatchMessage(Message.PLAYER_HIT.ordinal(), new HurtData(
-//                hurt,
-//                hit.getComponent(PlayerComponent.class).fighter.damage
-//        ));
+        //
+        //        messageDispatcher.dispatchMessage(Message.PLAYER_HIT.ordinal(), new HurtData(
+        //                hurt,
+        //                hit.getComponent(PlayerComponent.class).fighter.damage
+        //        ));
     }
 }

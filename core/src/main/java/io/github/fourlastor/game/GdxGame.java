@@ -59,7 +59,7 @@ public class GdxGame extends Game implements Router {
         pendingScreen = levelScreenFactory
                 .router(new RouterModule(this))
                 .map(new MapModule(levelIndex))
-                .build().screen();
+                .build()
+                .screen();
     }
-
 }

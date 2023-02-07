@@ -16,10 +16,9 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Factory to create various entities: player, buildings, enemies..
@@ -33,7 +32,8 @@ public class EntitiesFactory {
     private final GameConfig config;
 
     @Inject
-    public EntitiesFactory(TextureAtlas atlas, LdtkDefinitions definitions, LdtkLevelDefinition definition, GameConfig config) {
+    public EntitiesFactory(
+            TextureAtlas atlas, LdtkDefinitions definitions, LdtkLevelDefinition definition, GameConfig config) {
         this.atlas = atlas;
         this.definitions = definitions;
         this.definition = definition;
@@ -47,10 +47,14 @@ public class EntitiesFactory {
         final float tileSize = 16f * config.scale;
         final float centerAdjust = tileSize / 2;
         float[] vertices = new float[] {
-                -centerAdjust, -centerAdjust,
-                -centerAdjust, centerAdjust,
-                centerAdjust, centerAdjust,
-                centerAdjust, -centerAdjust,
+            -centerAdjust,
+            -centerAdjust,
+            -centerAdjust,
+            centerAdjust,
+            centerAdjust,
+            centerAdjust,
+            centerAdjust,
+            -centerAdjust,
         };
 
         List<LdtkLayerInstance> layerInstances =
@@ -66,10 +70,11 @@ public class EntitiesFactory {
                 entity.add(new ActorComponent(tile, ActorComponent.Layer.BG_PARALLAX));
                 entity.add(new BodyBuilderComponent(world -> {
                     BodyDef def = new BodyDef();
-                    def.position.set(
-                            tileInstance.x() * config.scale,
-                            tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * config.scale
-                    ).add(centerAdjust, centerAdjust);
+                    def.position
+                            .set(
+                                    tileInstance.x() * config.scale,
+                                    tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * config.scale)
+                            .add(centerAdjust, centerAdjust);
                     def.type = BodyDef.BodyType.StaticBody;
                     Body body = world.createBody(def);
                     FixtureDef fixtureDef = new FixtureDef();
@@ -85,5 +90,4 @@ public class EntitiesFactory {
         }
         return entities;
     }
-
 }

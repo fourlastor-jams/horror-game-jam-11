@@ -5,5 +5,4 @@ public interface Router {
     void goToIntro();
 
     void goToLevel(int levelIndex);
-
 }

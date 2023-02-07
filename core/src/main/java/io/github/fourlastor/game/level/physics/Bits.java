@@ -3,7 +3,11 @@ package io.github.fourlastor.game.level.physics;
 public class Bits {
 
     public enum Category {
-        BODY, GROUND, SHADOW, HITBOX, HURTBOX;
+        BODY,
+        GROUND,
+        SHADOW,
+        HITBOX,
+        HURTBOX;
         public final short bits;
 
         Category() {
