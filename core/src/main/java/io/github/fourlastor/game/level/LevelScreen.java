@@ -29,6 +29,7 @@ public class LevelScreen extends ScreenAdapter {
         for (Entity tile : factory.tiles()) {
             engine.addEntity(tile);
         }
+        engine.addEntity(factory.character());
     }
 
     @Override
