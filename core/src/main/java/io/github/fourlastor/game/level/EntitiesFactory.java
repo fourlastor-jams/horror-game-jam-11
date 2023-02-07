@@ -31,6 +31,7 @@ import javax.inject.Inject;
  * Factory to create various entities: player, buildings, enemies..
  */
 @ScreenScoped
+@SuppressWarnings("DataFlowIssue")
 public class EntitiesFactory {
 
     private final AssetManager assetManager;
@@ -41,7 +42,11 @@ public class EntitiesFactory {
 
     @Inject
     public EntitiesFactory(
-            AssetManager assetManager, TextureAtlas atlas, LdtkDefinitions definitions, LdtkLevelDefinition definition, GameConfig config) {
+            AssetManager assetManager,
+            TextureAtlas atlas,
+            LdtkDefinitions definitions,
+            LdtkLevelDefinition definition,
+            GameConfig config) {
         this.assetManager = assetManager;
         this.atlas = atlas;
         this.definitions = definitions;
@@ -102,7 +107,8 @@ public class EntitiesFactory {
 
     public Entity character() {
         Entity entity = new Entity();
-        AnimationNode.Group animationNode = assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
+        AnimationNode.Group animationNode =
+                assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         AnimationStateMachine animation = new AnimationStateMachine(animationNode);
         float scale = config.scale / 2;
         animation.setOrigin(Align.left);
@@ -116,7 +122,9 @@ public class EntitiesFactory {
             def.type = BodyDef.BodyType.DynamicBody;
             float halfWidth = playerSpawn.width / 2f * scale;
             float halfHeight = playerSpawn.height / 2f * scale;
-            def.position.set(halfWidth + playerSpawn.x() * config.scale, halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * config.scale);
+            def.position.set(
+                    halfWidth + playerSpawn.x() * config.scale,
+                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * config.scale);
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
@@ -139,6 +147,7 @@ public class EntitiesFactory {
     }
 
     private LdtkLayerInstance entityLayer() {
+
         for (LdtkLayerInstance layerInstance : definition.layerInstances) {
             if ("Entities".equals(layerInstance.type)) {
                 return layerInstance;

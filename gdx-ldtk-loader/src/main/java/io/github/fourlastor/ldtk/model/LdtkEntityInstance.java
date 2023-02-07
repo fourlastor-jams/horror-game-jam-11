@@ -54,7 +54,6 @@ public class LdtkEntityInstance {
      */
     public final IntArray px;
 
-
     public int x() {
         return px.get(0);
     }
