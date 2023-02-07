@@ -6,5 +6,4 @@ public interface Router {
 
     void goToLevel();
 
-    void goToGameOver();
 }
