@@ -54,6 +54,14 @@ public class LdtkEntityInstance {
      */
     public final IntArray px;
 
+    public int x() {
+        return px.get(0);
+    }
+
+    public int y(int levelHeight, int gridSize) {
+        return levelHeight * gridSize - px.get(1);
+    }
+
     /**
      * Entity width in pixels. For non-resizable entities, it will be the same as Entity definition.
      */

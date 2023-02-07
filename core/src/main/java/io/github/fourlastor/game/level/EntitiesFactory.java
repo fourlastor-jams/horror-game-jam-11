@@ -1,16 +1,23 @@
 package io.github.fourlastor.game.level;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
+import io.github.fourlastor.game.level.component.FollowBodyComponent;
+import io.github.fourlastor.harlequin.animation.AnimationNode;
+import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 import io.github.fourlastor.ldtk.model.LdtkDefinitions;
+import io.github.fourlastor.ldtk.model.LdtkEntityInstance;
 import io.github.fourlastor.ldtk.model.LdtkLayerInstance;
 import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
@@ -24,8 +31,10 @@ import javax.inject.Inject;
  * Factory to create various entities: player, buildings, enemies..
  */
 @ScreenScoped
+@SuppressWarnings("DataFlowIssue")
 public class EntitiesFactory {
 
+    private final AssetManager assetManager;
     private final TextureAtlas atlas;
     private final LdtkDefinitions definitions;
     private final LdtkLevelDefinition definition;
@@ -33,7 +42,12 @@ public class EntitiesFactory {
 
     @Inject
     public EntitiesFactory(
-            TextureAtlas atlas, LdtkDefinitions definitions, LdtkLevelDefinition definition, GameConfig config) {
+            AssetManager assetManager,
+            TextureAtlas atlas,
+            LdtkDefinitions definitions,
+            LdtkLevelDefinition definition,
+            GameConfig config) {
+        this.assetManager = assetManager;
         this.atlas = atlas;
         this.definitions = definitions;
         this.definition = definition;
@@ -89,5 +103,56 @@ public class EntitiesFactory {
             }
         }
         return entities;
+    }
+
+    public Entity character() {
+        Entity entity = new Entity();
+        AnimationNode.Group animationNode =
+                assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
+        AnimationStateMachine animation = new AnimationStateMachine(animationNode);
+        float scale = config.scale / 2;
+        animation.setOrigin(Align.left);
+        animation.setScale(scale, scale);
+        entity.add(new ActorComponent(animation, ActorComponent.Layer.CHARACTER));
+        entity.add(new FollowBodyComponent());
+        LdtkLayerInstance entityLayer = entityLayer();
+        LdtkEntityInstance playerSpawn = playerSpawn(entityLayer);
+        entity.add(new BodyBuilderComponent(world -> {
+            BodyDef def = new BodyDef();
+            def.type = BodyDef.BodyType.DynamicBody;
+            float halfWidth = playerSpawn.width / 2f * scale;
+            float halfHeight = playerSpawn.height / 2f * scale;
+            def.position.set(
+                    halfWidth + playerSpawn.x() * config.scale,
+                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * config.scale);
+            Body body = world.createBody(def);
+            FixtureDef fixtureDef = new FixtureDef();
+            PolygonShape shape = new PolygonShape();
+            fixtureDef.shape = shape;
+            shape.setAsBox(halfWidth, halfHeight);
+            body.createFixture(fixtureDef);
+            shape.dispose();
+            return body;
+        }));
+        return entity;
+    }
+
+    private LdtkEntityInstance playerSpawn(LdtkLayerInstance ldtkLayerInstance) {
+        for (LdtkEntityInstance instance : ldtkLayerInstance.entityInstances) {
+            if ("Player".equals(instance.identifier)) {
+                return instance;
+            }
+        }
+        throw new IllegalStateException("Missing player spawn point");
+    }
+
+    private LdtkLayerInstance entityLayer() {
+
+        for (LdtkLayerInstance layerInstance : definition.layerInstances) {
+            if ("Entities".equals(layerInstance.type)) {
+                return layerInstance;
+            }
+        }
+        throw new IllegalStateException("Missing entities layer");
     }
 }

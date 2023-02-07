@@ -132,9 +132,9 @@ public class PhysicsSystem extends IntervalSystem {
         public void preSolve(Contact contact, Manifold oldManifold) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
-            if (fixtureA.getUserData() == fixtureB.getUserData()) {
-                contact.setEnabled(false);
-            }
+            //            if (fixtureA.getUserData() == fixtureB.getUserData()) {
+            //                contact.setEnabled(false);
+            //            }
         }
 
         @Override
