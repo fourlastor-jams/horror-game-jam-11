@@ -11,7 +11,7 @@ import io.github.fourlastor.game.level.component.PlayerComponent;
 
 import javax.inject.Inject;
 
-public class Jumping extends CharacterState {
+public class Jumping extends LateralMovement {
 
     private final GameConfig config;
 
@@ -42,6 +42,7 @@ public class Jumping extends CharacterState {
 
     @Override
     public void update(Entity entity) {
+        super.update(entity);
         timePassed += delta();
         if (timePassed > 1f) {
             PlayerComponent playerComponent = players.get(entity);
