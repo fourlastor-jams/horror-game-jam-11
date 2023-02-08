@@ -8,7 +8,6 @@ import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
-import io.github.fourlastor.game.level.component.ChunkRemovalComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
@@ -19,7 +18,7 @@ public class EcsModule {
 
     @Provides
     @ScreenScoped
-    public ComponentMapper<AnimatedComponent> animatedImageComponent() {
+    public ComponentMapper<AnimatedComponent> animatedComponent() {
         return ComponentMapper.getFor(AnimatedComponent.class);
     }
 
@@ -31,7 +30,7 @@ public class EcsModule {
 
     @Provides
     @ScreenScoped
-    public ComponentMapper<ActorComponent> imageComponent() {
+    public ComponentMapper<ActorComponent> actorComponent() {
         return ComponentMapper.getFor(ActorComponent.class);
     }
 
@@ -51,12 +50,6 @@ public class EcsModule {
     @ScreenScoped
     public ComponentMapper<PlayerComponent> playerComponent() {
         return ComponentMapper.getFor(PlayerComponent.class);
-    }
-
-    @Provides
-    @ScreenScoped
-    public ComponentMapper<ChunkRemovalComponent> chunkRemovalComponent() {
-        return ComponentMapper.getFor(ChunkRemovalComponent.class);
     }
 
     @Provides
