@@ -2,73 +2,72 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import io.github.fourlastor.game.level.PlayerAnimationsFactory;
-import io.github.fourlastor.game.level.component.AnimatedImageComponent;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.harlequin.animation.Animation;
-import javax.inject.Inject;
-import javax.inject.Named;
+import io.github.fourlastor.game.level.input.controls.Command;
+import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
-public class OnGround extends InputState {
+public abstract class OnGround extends CharacterState {
+    private static final float VELOCITY = 4f;
+    private final Camera camera;
+    private final Vector2 velocity = Vector2.Zero.cpy();
 
-    private final Animation<Drawable> animation;
-    private AssetManager assetManager;
-
-    @Inject
     public OnGround(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
-            ComponentMapper<AnimatedImageComponent> images,
-            @Named(PlayerAnimationsFactory.ANIMATION_STANDING) Animation<Drawable> animation,
-            AssetManager assetManager) {
-        super(players, bodies, images);
-        this.animation = animation;
-        this.assetManager = assetManager;
+            ComponentMapper<AnimatedComponent> animated,
+            ComponentMapper<InputComponent> inputs,
+            Camera camera) {
+        super(players, bodies, animated, inputs);
+        this.camera = camera;
     }
 
     @Override
-    protected Animation<Drawable> animation() {
-        return animation;
+    public void exit(Entity entity) {
+        velocity.set(Vector2.Zero);
+        updateBodyVelocity(entity);
+        super.exit(entity);
     }
 
     @Override
-    public void enter(Entity entity) {
-        super.enter(entity);
-        playRandomSounds(assetManager);
-    }
-
-    @Override
-    public boolean keyDown(Entity entity, int keycode) {
-        if (keycode == Input.Keys.SPACE) {
+    public void update(Entity entity) {
+        Command command = inputs.get(entity).command;
+        if (command == Command.ATTACK) {
             PlayerComponent player = players.get(entity);
-            player.stateMachine.changeState(player.chargeJump);
-            return true;
+            player.stateMachine.changeState(player.jumping);
+            return;
         }
-        return super.keyDown(entity, keycode);
+        boolean goingLeft = command == Command.LEFT;
+        boolean goingRight = command == Command.RIGHT;
+        if (goingLeft || goingRight) {
+            velocity.x = goingLeft ? -VELOCITY : VELOCITY;
+            AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
+            float scale = Math.abs(stateMachine.getScaleX());
+            stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));
+        } else {
+            velocity.set(Vector2.Zero);
+        }
+        updateBodyVelocity(entity);
     }
 
-    @Override
-    public boolean touchDown(Entity entity, int screenX, int screenY, int pointer, int button) {
-        PlayerComponent player = players.get(entity);
-        player.stateMachine.changeState(player.chargeJump);
-        return true;
+    private void updateBodyVelocity(Entity entity) {
+        Body body = bodies.get(entity).body;
+        boolean goingLeft = velocity.x < 0;
+        boolean atLeftLimit = body.getPosition().x - 1 <= camera.position.x - camera.viewportWidth / 2f;
+        boolean atRightLimit = body.getPosition().x + 1 >= camera.position.x + camera.viewportWidth / 2f;
+        if ((goingLeft && atLeftLimit) || (!goingLeft && atRightLimit)) {
+            body.setLinearVelocity(Vector2.Zero);
+        } else {
+            body.setLinearVelocity(velocity);
+        }
     }
 
-    private void playRandomSounds(AssetManager assetManager) {
-        int random = MathUtils.random(0, 4);
-        Sound playerSound = assetManager.get("audio/sounds/onGround/onGround_" + random + ".wav", Sound.class);
-        playerSound.play();
-
-        Sound grateSound = assetManager.get("audio/sounds/grateSound.wav", Sound.class);
-        grateSound.play(1, MathUtils.random(.7f, 1.3f), 0);
-
-        Sound splatSound = assetManager.get("audio/sounds/445109__breviceps__mud-splat.wav", Sound.class);
-        splatSound.play(.3f, MathUtils.random(.7f, 1.3f), 0);
+    protected final boolean isMoving() {
+        return velocity.x != 0;
     }
 }

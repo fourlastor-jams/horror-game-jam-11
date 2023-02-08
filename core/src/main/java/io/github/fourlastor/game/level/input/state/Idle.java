@@ -2,42 +2,36 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Camera;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import javax.inject.Inject;
 
-public class Jumping extends CharacterState {
+public class Idle extends OnGround {
 
     @Inject
-    public Jumping(
+    public Idle(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs) {
-        super(players, bodies, animated, inputs);
+            ComponentMapper<InputComponent> inputs,
+            Camera camera) {
+        super(players, bodies, animated, inputs, camera);
     }
 
     @Override
     protected String animation() {
-        return "jump";
-    }
-
-    float timePassed = 0f;
-
-    @Override
-    public void enter(Entity entity) {
-        super.enter(entity);
-        timePassed = 0f;
+        return "idle";
     }
 
     @Override
     public void update(Entity entity) {
-        timePassed += delta();
-        if (timePassed > 1f) {
-            PlayerComponent playerComponent = players.get(entity);
-            playerComponent.stateMachine.changeState(playerComponent.idle);
+        super.update(entity);
+        if (isMoving()) {
+            PlayerComponent player = players.get(entity);
+            player.stateMachine.changeState(player.running);
         }
     }
 }

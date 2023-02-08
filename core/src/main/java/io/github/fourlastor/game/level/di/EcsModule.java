@@ -5,10 +5,11 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.AnimatedImageComponent;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.ChunkRemovalComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
@@ -18,8 +19,14 @@ public class EcsModule {
 
     @Provides
     @ScreenScoped
-    public ComponentMapper<AnimatedImageComponent> animatedImageComponent() {
-        return ComponentMapper.getFor(AnimatedImageComponent.class);
+    public ComponentMapper<AnimatedComponent> animatedImageComponent() {
+        return ComponentMapper.getFor(AnimatedComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<InputComponent> inputComponent() {
+        return ComponentMapper.getFor(InputComponent.class);
     }
 
     @Provides

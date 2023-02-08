@@ -10,15 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.AnimatedImageComponent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 
 public class StageSystem extends EntitySystem implements EntityListener {
 
-    private static final Family FAMILY =
-            Family.one(AnimatedImageComponent.class, ActorComponent.class).get();
+    private static final Family FAMILY = Family.one(ActorComponent.class).get();
     private final Stage stage;
     private final ComponentMapper<ActorComponent> actors;
     private final List<Group> layers;

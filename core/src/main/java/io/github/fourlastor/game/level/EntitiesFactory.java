@@ -12,8 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
+import io.github.fourlastor.game.level.component.PlayerRequestComponent;
+import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 import io.github.fourlastor.ldtk.model.LdtkDefinitions;
@@ -134,6 +138,9 @@ public class EntitiesFactory {
             shape.dispose();
             return body;
         }));
+        entity.add(new AnimatedComponent(animation));
+        entity.add(new PlayerRequestComponent(Controls.Setup.P1));
+        entity.add(new InputComponent());
         return entity;
     }
 

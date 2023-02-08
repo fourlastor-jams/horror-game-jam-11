@@ -1,31 +1,29 @@
 package io.github.fourlastor.game.level.component;
 
 import com.badlogic.ashley.core.Component;
-import io.github.fourlastor.game.level.input.InputStateMachine;
-import io.github.fourlastor.game.level.input.state.ChargeJump;
-import io.github.fourlastor.game.level.input.state.Falling;
+import io.github.fourlastor.game.level.input.CharacterStateMachine;
+import io.github.fourlastor.game.level.input.controls.Controls;
+import io.github.fourlastor.game.level.input.state.Idle;
 import io.github.fourlastor.game.level.input.state.Jumping;
-import io.github.fourlastor.game.level.input.state.OnGround;
+import io.github.fourlastor.game.level.input.state.Running;
 
-/** Bag containing the player state machine, and the possible states it can get into. */
+/**
+ * Bag containing the player state machine, and the possible states it can get into.
+ */
 public class PlayerComponent implements Component {
-    public final InputStateMachine stateMachine;
-    public final OnGround onGround;
-    public final Falling falling;
+
+    public final Controls controls;
+    public final CharacterStateMachine stateMachine;
+    public final Idle idle;
+    public final Running running;
     public final Jumping jumping;
-    public final ChargeJump chargeJump;
-    public float charge = 0f;
 
     public PlayerComponent(
-            InputStateMachine stateMachine,
-            OnGround onGround,
-            Falling falling,
-            Jumping jumping,
-            ChargeJump chargeJump) {
+            Controls controls, CharacterStateMachine stateMachine, Idle idle, Running running, Jumping jumping) {
+        this.controls = controls;
         this.stateMachine = stateMachine;
-        this.onGround = onGround;
-        this.falling = falling;
+        this.idle = idle;
+        this.running = running;
         this.jumping = jumping;
-        this.chargeJump = chargeJump;
     }
 }
