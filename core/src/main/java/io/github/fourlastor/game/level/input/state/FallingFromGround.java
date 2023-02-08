@@ -19,7 +19,7 @@ public class FallingFromGround extends Falling {
     @Override
     public void update(Entity entity) {
         super.update(entity);
-        if (inputs.get(entity).jumpJustPressed && fallingTime() < config.fallingGraceTime) {
+        if (inputs.get(entity).jumpJustPressed && fallingTime() < config.player.fallingGraceTime) {
             PlayerComponent playerComponent = players.get(entity);
             playerComponent.stateMachine.changeState(playerComponent.jumping);
         }

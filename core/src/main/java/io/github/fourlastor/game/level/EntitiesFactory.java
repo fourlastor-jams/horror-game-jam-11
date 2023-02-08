@@ -62,10 +62,11 @@ public class EntitiesFactory {
     }
 
     public List<Entity> tiles() {
-        LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", config.scale);
+        float scale = config.display.scale;
+        LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", scale);
         List<Entity> entities = new ArrayList<>();
 
-        final float tileSize = 16f * config.scale;
+        final float tileSize = 16f * scale;
         final float centerAdjust = tileSize / 2;
         float[] vertices = new float[] {
             -centerAdjust,
@@ -93,8 +94,8 @@ public class EntitiesFactory {
                     BodyDef def = new BodyDef();
                     def.position
                             .set(
-                                    tileInstance.x() * config.scale,
-                                    tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * config.scale)
+                                    tileInstance.x() * scale,
+                                    tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * scale)
                             .add(centerAdjust, centerAdjust);
                     def.type = BodyDef.BodyType.StaticBody;
                     Body body = world.createBody(def);
@@ -119,9 +120,10 @@ public class EntitiesFactory {
         AnimationNode.Group animationNode =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         AnimationStateMachine animation = new AnimationStateMachine(animationNode);
-        float scale = config.scale / 2;
+        float scale = config.display.scale;
         animation.setOrigin(Align.left);
-        animation.setScale(scale, scale);
+        float halfScale = scale / 2;
+        animation.setScale(halfScale, halfScale);
         entity.add(new ActorComponent(animation, ActorComponent.Layer.CHARACTER));
         entity.add(new FollowBodyComponent());
         LdtkLayerInstance entityLayer = entityLayer();
@@ -129,11 +131,11 @@ public class EntitiesFactory {
         entity.add(new BodyBuilderComponent(world -> {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.DynamicBody;
-            float halfWidth = playerSpawn.width / 2f * scale;
-            float halfHeight = playerSpawn.height / 2f * scale;
+            float halfWidth = playerSpawn.width / 2f * halfScale;
+            float halfHeight = playerSpawn.height / 2f * halfScale;
             def.position.set(
-                    halfWidth + playerSpawn.x() * config.scale,
-                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * config.scale);
+                    halfWidth + playerSpawn.x() * scale,
+                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * scale);
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();

@@ -30,7 +30,7 @@ public abstract class HorizontalMovement extends CharacterState {
         boolean goingLeft = input.leftPressed;
         boolean goingRight = input.rightPressed;
         if (goingLeft || goingRight) {
-            velocity = goingLeft ? -config.movementSpeed : config.movementSpeed;
+            velocity = goingLeft ? -config.player.movementSpeed : config.player.movementSpeed;
             AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
             float scale = Math.abs(stateMachine.getScaleX());
             stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));

@@ -57,7 +57,7 @@ public class LevelModule {
     @Provides
     @ScreenScoped
     public Viewport viewport(GameConfig config) {
-        return new FitViewport(config.width, config.height);
+        return new FitViewport(config.display.width, config.display.height);
     }
 
     @Provides
@@ -75,7 +75,7 @@ public class LevelModule {
     @Provides
     @ScreenScoped
     public World world(GameConfig config) {
-        return new World(config.gravity, true);
+        return new World(config.physics.gravity, true);
     }
 
     @Provides
@@ -86,6 +86,10 @@ public class LevelModule {
 
     @Provides
     public GameConfig gameConfig() {
-        return new GameConfig(16f, 9f, 1f / 16f, new Vector2(0f, -10f), 4f, 5f, 0.2f);
+        return new GameConfig(
+                new GameConfig.Display(16f, 9f, 1f / 16f),
+                new GameConfig.Physics(new Vector2(0f, -10f)),
+                new GameConfig.Player(4f, 5f, 0.2f)
+        );
     }
 }

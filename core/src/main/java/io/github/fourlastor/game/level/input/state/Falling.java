@@ -56,7 +56,7 @@ abstract class Falling extends HorizontalMovement {
     public boolean onMessage(Entity entity, Telegram telegram) {
         if (telegram.message == Message.PLAYER_ON_GROUND.ordinal()) {
             PlayerComponent playerComponent = players.get(entity);
-            if (attemptedTime >= 0 && fallingTime - attemptedTime < 0.2f) {
+            if (attemptedTime >= 0 && fallingTime - attemptedTime < config.player.fallingGraceTime) {
                 playerComponent.stateMachine.changeState(playerComponent.jumping);
             } else {
                 playerComponent.stateMachine.changeState(playerComponent.idle);
