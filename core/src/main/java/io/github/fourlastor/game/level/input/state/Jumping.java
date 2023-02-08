@@ -36,7 +36,7 @@ public class Jumping extends HorizontalMovement {
     public void enter(Entity entity) {
         super.enter(entity);
         Body body = bodies.get(entity).body;
-        setVerticalVelocity(body, calculateVerticalVelocityForHeight(3f));
+        setVerticalVelocity(body, calculateVerticalVelocityForHeight(5f));
     }
 
     @Override

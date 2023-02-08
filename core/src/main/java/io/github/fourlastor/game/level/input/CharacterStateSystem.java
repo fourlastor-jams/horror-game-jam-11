@@ -15,6 +15,7 @@ import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
+import io.github.fourlastor.game.level.input.state.FallingFromGround;
 import io.github.fourlastor.game.level.input.state.FallingFromJump;
 import io.github.fourlastor.game.level.input.state.Idle;
 import io.github.fourlastor.game.level.input.state.Jumping;
@@ -72,6 +73,7 @@ public class CharacterStateSystem extends IteratingSystem {
         private final Provider<Running> walkingFactory;
         private final Provider<Jumping> jumpingFactory;
         private final Provider<FallingFromJump> fallingFromJumpFactory;
+        private final Provider<FallingFromGround> fallingFromGroundFactory;
         private final CharacterStateMachine.Factory stateMachineFactory;
         private final MessageDispatcher messageDispatcher;
 
@@ -81,12 +83,13 @@ public class CharacterStateSystem extends IteratingSystem {
                 Provider<Running> walkingFactory,
                 Provider<Jumping> jumpingFactory,
                 Provider<FallingFromJump> fallingFromJumpFactory,
-                CharacterStateMachine.Factory stateMachineFactory,
+                Provider<FallingFromGround> fallingFromGroundFactory, CharacterStateMachine.Factory stateMachineFactory,
                 MessageDispatcher messageDispatcher) {
             this.idleFactory = idleFactory;
             this.walkingFactory = walkingFactory;
             this.jumpingFactory = jumpingFactory;
             this.fallingFromJumpFactory = fallingFromJumpFactory;
+            this.fallingFromGroundFactory = fallingFromGroundFactory;
             this.stateMachineFactory = stateMachineFactory;
             this.messageDispatcher = messageDispatcher;
         }
@@ -101,7 +104,8 @@ public class CharacterStateSystem extends IteratingSystem {
             Jumping jumping = jumpingFactory.get();
             FallingFromJump fallingFromJump = fallingFromJumpFactory.get();
             CharacterStateMachine stateMachine = stateMachineFactory.create(entity, idle);
-            entity.add(new PlayerComponent(controls, stateMachine, idle, running, jumping, fallingFromJump));
+            FallingFromGround fallingFromGround = fallingFromGroundFactory.get();
+            entity.add(new PlayerComponent(controls, stateMachine, idle, running, jumping, fallingFromJump, fallingFromGround));
             stateMachine.getCurrentState().enter(entity);
             for (Message value : Message.values()) {
                 messageDispatcher.addListener(stateMachine, value.ordinal());
