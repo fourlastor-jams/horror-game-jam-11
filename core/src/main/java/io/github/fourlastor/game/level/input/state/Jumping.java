@@ -8,6 +8,7 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+
 import javax.inject.Inject;
 
 public class Jumping extends HorizontalMovement {
@@ -30,24 +31,29 @@ public class Jumping extends HorizontalMovement {
         return "jump";
     }
 
-    float timePassed = 0f;
 
     @Override
     public void enter(Entity entity) {
         super.enter(entity);
-        timePassed = 0f;
         Body body = bodies.get(entity).body;
-        body.setLinearVelocity(body.getLinearVelocity().x, calculateVerticalVelocityForHeight(3f));
+        setVerticalVelocity(body, calculateVerticalVelocityForHeight(3f));
     }
 
     @Override
     public void update(Entity entity) {
         super.update(entity);
-        timePassed += delta();
-        if (timePassed > 1f) {
+        Body body = bodies.get(entity).body;
+        if (!inputs.get(entity).jumpPressed) {
+            setVerticalVelocity(body, 0f);
+        }
+        if (body.getLinearVelocity().y <= 0f) {
             PlayerComponent playerComponent = players.get(entity);
             playerComponent.stateMachine.changeState(playerComponent.idle);
         }
+    }
+
+    private void setVerticalVelocity(Body body, float vY) {
+        body.setLinearVelocity(body.getLinearVelocity().x, vY);
     }
 
     /** @see <a href="http://www.iforce2d.net/b2dtut/projected-trajectory">Box2D projected trajectory</a> */
