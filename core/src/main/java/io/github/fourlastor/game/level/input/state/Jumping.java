@@ -11,7 +11,7 @@ import io.github.fourlastor.game.level.component.PlayerComponent;
 
 import javax.inject.Inject;
 
-public class Jumping extends LateralMovement {
+public class Jumping extends HorizontalMovement {
 
     private final GameConfig config;
 

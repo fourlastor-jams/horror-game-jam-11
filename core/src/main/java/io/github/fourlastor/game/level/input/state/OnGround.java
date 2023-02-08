@@ -7,7 +7,7 @@ import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 
-public abstract class OnGround extends LateralMovement {
+public abstract class OnGround extends HorizontalMovement {
 
     public OnGround(
             ComponentMapper<PlayerComponent> players,
