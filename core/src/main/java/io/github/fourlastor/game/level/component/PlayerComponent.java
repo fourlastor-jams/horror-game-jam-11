@@ -23,7 +23,13 @@ public class PlayerComponent implements Component {
     public final FallingFromGround fallingFromGround;
 
     public PlayerComponent(
-            Controls controls, CharacterStateMachine stateMachine, Idle idle, Running running, Jumping jumping, FallingFromJump fallingFromJump, FallingFromGround fallingFromGround) {
+            Controls controls,
+            CharacterStateMachine stateMachine,
+            Idle idle,
+            Running running,
+            Jumping jumping,
+            FallingFromJump fallingFromJump,
+            FallingFromGround fallingFromGround) {
         this.controls = controls;
         this.stateMachine = stateMachine;
         this.idle = idle;

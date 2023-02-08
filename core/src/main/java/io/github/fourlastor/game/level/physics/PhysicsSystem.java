@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
-
 import javax.inject.Inject;
 
 public class PhysicsSystem extends IntervalSystem {
@@ -129,8 +128,7 @@ public class PhysicsSystem extends IntervalSystem {
         public void endContact(Contact contact) {}
 
         @Override
-        public void preSolve(Contact contact, Manifold oldManifold) {
-        }
+        public void preSolve(Contact contact, Manifold oldManifold) {}
 
         @Override
         public void postSolve(Contact contact, ContactImpulse impulse) {}

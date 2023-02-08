@@ -20,7 +20,6 @@ import io.github.fourlastor.game.level.input.state.FallingFromJump;
 import io.github.fourlastor.game.level.input.state.Idle;
 import io.github.fourlastor.game.level.input.state.Jumping;
 import io.github.fourlastor.game.level.input.state.Running;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -83,7 +82,8 @@ public class CharacterStateSystem extends IteratingSystem {
                 Provider<Running> walkingFactory,
                 Provider<Jumping> jumpingFactory,
                 Provider<FallingFromJump> fallingFromJumpFactory,
-                Provider<FallingFromGround> fallingFromGroundFactory, CharacterStateMachine.Factory stateMachineFactory,
+                Provider<FallingFromGround> fallingFromGroundFactory,
+                CharacterStateMachine.Factory stateMachineFactory,
                 MessageDispatcher messageDispatcher) {
             this.idleFactory = idleFactory;
             this.walkingFactory = walkingFactory;
@@ -105,7 +105,8 @@ public class CharacterStateSystem extends IteratingSystem {
             FallingFromJump fallingFromJump = fallingFromJumpFactory.get();
             CharacterStateMachine stateMachine = stateMachineFactory.create(entity, idle);
             FallingFromGround fallingFromGround = fallingFromGroundFactory.get();
-            entity.add(new PlayerComponent(controls, stateMachine, idle, running, jumping, fallingFromJump, fallingFromGround));
+            entity.add(new PlayerComponent(
+                    controls, stateMachine, idle, running, jumping, fallingFromJump, fallingFromGround));
             stateMachine.getCurrentState().enter(entity);
             for (Message value : Message.values()) {
                 messageDispatcher.addListener(stateMachine, value.ordinal());

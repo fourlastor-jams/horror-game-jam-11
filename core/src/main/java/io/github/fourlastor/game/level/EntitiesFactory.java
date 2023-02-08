@@ -29,10 +29,9 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Factory to create various entities: player, buildings, enemies..

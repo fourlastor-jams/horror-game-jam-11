@@ -17,12 +17,12 @@ abstract class Falling extends HorizontalMovement {
     private float fallingTime = 0f;
     private float attemptedTime = -1;
 
-
     public Falling(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs, GameConfig config) {
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
         super(players, bodies, animated, inputs, config);
         this.config = config;
     }

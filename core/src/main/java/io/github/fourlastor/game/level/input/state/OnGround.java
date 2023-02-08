@@ -14,7 +14,8 @@ public abstract class OnGround extends HorizontalMovement {
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs, GameConfig config) {
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
         super(players, bodies, animated, inputs, config);
     }
 
