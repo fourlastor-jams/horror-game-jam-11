@@ -86,6 +86,6 @@ public class LevelModule {
 
     @Provides
     public GameConfig gameConfig() {
-        return new GameConfig(16f, 9f, 1f / 16f, new Vector2(0f, -10f));
+        return new GameConfig(16f, 9f, 1f / 16f, new Vector2(0f, -10f), 0.2f);
     }
 }

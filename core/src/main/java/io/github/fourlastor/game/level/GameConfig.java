@@ -7,11 +7,13 @@ public class GameConfig {
     public final float height;
     public final float scale;
     public final Vector2 gravity;
+    public final float fallingGraceTime;
 
-    public GameConfig(float width, float height, float scale, Vector2 gravity) {
+    public GameConfig(float width, float height, float scale, Vector2 gravity, float fallingGraceTime) {
         this.width = width;
         this.height = height;
         this.scale = scale;
         this.gravity = gravity;
+        this.fallingGraceTime = fallingGraceTime;
     }
 }

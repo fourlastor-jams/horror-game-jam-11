@@ -3,6 +3,7 @@ package io.github.fourlastor.game.level.input.state;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.msg.Telegram;
+import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
@@ -10,6 +11,8 @@ import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 
 abstract class Falling extends HorizontalMovement {
+
+    protected final GameConfig config;
 
     private float fallingTime = 0f;
     private float attemptedTime = -1;
@@ -19,8 +22,13 @@ abstract class Falling extends HorizontalMovement {
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs) {
+            ComponentMapper<InputComponent> inputs, GameConfig config) {
         super(players, bodies, animated, inputs);
+        this.config = config;
+    }
+
+    protected final float fallingTime() {
+        return fallingTime;
     }
 
     @Override
