@@ -7,7 +7,7 @@ public interface Controls {
 
     Control right();
 
-    Control attack();
+    Control jump();
 
     enum Setup implements Controls {
         P1(Input.Keys.A, Input.Keys.D, Input.Keys.SPACE);
@@ -33,7 +33,7 @@ public interface Controls {
         }
 
         @Override
-        public Control attack() {
+        public Control jump() {
             return jump;
         }
     }

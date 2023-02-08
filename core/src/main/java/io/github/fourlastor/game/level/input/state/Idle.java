@@ -6,6 +6,7 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+
 import javax.inject.Inject;
 
 public class Idle extends OnGround {
@@ -25,8 +26,7 @@ public class Idle extends OnGround {
     }
 
     @Override
-    public void update(Entity entity) {
-        super.update(entity);
+    public void groundUpdate(Entity entity) {
         if (isMoving()) {
             PlayerComponent player = players.get(entity);
             player.stateMachine.changeState(player.running);

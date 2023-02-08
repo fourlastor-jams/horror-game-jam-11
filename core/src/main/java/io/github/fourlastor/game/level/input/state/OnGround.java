@@ -6,7 +6,6 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.game.level.input.controls.Command;
 
 public abstract class OnGround extends LateralMovement {
 
@@ -19,13 +18,15 @@ public abstract class OnGround extends LateralMovement {
     }
 
     @Override
-    public void update(Entity entity) {
-        Command command = inputs.get(entity).command;
-        if (command == Command.JUMP) {
+    public final void update(Entity entity) {
+        if (inputs.get(entity).jumpJustPressed) {
             PlayerComponent player = players.get(entity);
             player.stateMachine.changeState(player.jumping);
             return;
         }
         super.update(entity);
+        groundUpdate(entity);
     }
+
+    abstract void groundUpdate(Entity entity);
 }

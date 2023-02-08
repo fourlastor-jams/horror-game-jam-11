@@ -8,7 +8,6 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.game.level.input.controls.Command;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
 public abstract class LateralMovement extends CharacterState {
@@ -21,9 +20,9 @@ public abstract class LateralMovement extends CharacterState {
 
     @Override
     public void update(Entity entity) {
-        Command command = inputs.get(entity).command;
-        boolean goingLeft = command == Command.LEFT;
-        boolean goingRight = command == Command.RIGHT;
+        InputComponent input = inputs.get(entity);
+        boolean goingLeft = input.leftPressed;
+        boolean goingRight = input.rightPressed;
         if (goingLeft || goingRight) {
             velocity.x = goingLeft ? -VELOCITY : VELOCITY;
             AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
