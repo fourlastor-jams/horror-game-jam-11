@@ -3,6 +3,7 @@ package io.github.fourlastor.game.level;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
@@ -12,8 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
+import io.github.fourlastor.game.level.component.PlayerRequestComponent;
+import io.github.fourlastor.game.level.input.controls.Controls;
+import io.github.fourlastor.game.level.physics.Bits;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 import io.github.fourlastor.ldtk.model.LdtkDefinitions;
@@ -55,10 +61,11 @@ public class EntitiesFactory {
     }
 
     public List<Entity> tiles() {
-        LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", config.scale);
+        float scale = config.display.scale;
+        LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", scale);
         List<Entity> entities = new ArrayList<>();
 
-        final float tileSize = 16f * config.scale;
+        final float tileSize = 16f * scale;
         final float centerAdjust = tileSize / 2;
         float[] vertices = new float[] {
             -centerAdjust,
@@ -86,12 +93,14 @@ public class EntitiesFactory {
                     BodyDef def = new BodyDef();
                     def.position
                             .set(
-                                    tileInstance.x() * config.scale,
-                                    tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * config.scale)
+                                    tileInstance.x() * scale,
+                                    tileInstance.y(layerInstance.cHei, layerInstance.gridSize) * scale)
                             .add(centerAdjust, centerAdjust);
                     def.type = BodyDef.BodyType.StaticBody;
                     Body body = world.createBody(def);
                     FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
                     ChainShape shape = new ChainShape();
                     shape.createLoop(vertices);
                     fixtureDef.shape = shape;
@@ -110,9 +119,10 @@ public class EntitiesFactory {
         AnimationNode.Group animationNode =
                 assetManager.get("images/included/animations/character/character.json", AnimationNode.Group.class);
         AnimationStateMachine animation = new AnimationStateMachine(animationNode);
-        float scale = config.scale / 2;
+        float scale = config.display.scale;
         animation.setOrigin(Align.left);
-        animation.setScale(scale, scale);
+        float halfScale = scale / 2;
+        animation.setScale(halfScale, halfScale);
         entity.add(new ActorComponent(animation, ActorComponent.Layer.CHARACTER));
         entity.add(new FollowBodyComponent());
         LdtkLayerInstance entityLayer = entityLayer();
@@ -120,20 +130,31 @@ public class EntitiesFactory {
         entity.add(new BodyBuilderComponent(world -> {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.DynamicBody;
-            float halfWidth = playerSpawn.width / 2f * scale;
-            float halfHeight = playerSpawn.height / 2f * scale;
+            float halfWidth = playerSpawn.width / 2f * halfScale;
+            float halfHeight = playerSpawn.height / 2f * halfScale;
             def.position.set(
-                    halfWidth + playerSpawn.x() * config.scale,
-                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * config.scale);
+                    halfWidth + playerSpawn.x() * scale,
+                    halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * scale);
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
-            fixtureDef.shape = shape;
             shape.setAsBox(halfWidth, halfHeight);
+            fixtureDef.shape = shape;
+            fixtureDef.friction = 0f;
+            fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
+            fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
+            body.createFixture(fixtureDef);
+            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight), 0f);
+            fixtureDef.isSensor = true;
+            fixtureDef.filter.categoryBits = Bits.Category.PLAYER_FOOT.bits;
+            fixtureDef.filter.maskBits = Bits.Mask.PLAYER_FOOT.bits;
             body.createFixture(fixtureDef);
             shape.dispose();
             return body;
         }));
+        entity.add(new AnimatedComponent(animation));
+        entity.add(new PlayerRequestComponent(Controls.Setup.P1));
+        entity.add(new InputComponent());
         return entity;
     }
 

@@ -12,7 +12,8 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.GameConfig;
-import io.github.fourlastor.game.level.input.PlayerInputSystem;
+import io.github.fourlastor.game.level.input.CharacterStateSystem;
+import io.github.fourlastor.game.level.input.InputBufferSystem;
 import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
 import io.github.fourlastor.game.level.physics.PhysicsSystem;
 import io.github.fourlastor.game.level.system.ActorFollowBodySystem;
@@ -28,7 +29,8 @@ public class LevelModule {
     @Provides
     @ScreenScoped
     public Engine engine(
-            PlayerInputSystem playerInputSystem,
+            InputBufferSystem inputBufferSystem,
+            CharacterStateSystem characterStateSystem,
             CameraMovementSystem cameraMovementSystem,
             PhysicsSystem physicsSystem,
             ActorFollowBodySystem actorFollowBodySystem,
@@ -40,21 +42,22 @@ public class LevelModule {
             SoundSystem soundSystem) {
         Engine engine = new Engine();
         engine.addSystem(movingSystem);
-        engine.addSystem(playerInputSystem);
+        engine.addSystem(inputBufferSystem);
+        engine.addSystem(characterStateSystem);
         engine.addSystem(physicsSystem);
         engine.addSystem(soundSystem);
         engine.addSystem(cameraMovementSystem);
         engine.addSystem(actorFollowBodySystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        //        engine.addSystem(physicsDebugSystem);
+        engine.addSystem(physicsDebugSystem);
         return engine;
     }
 
     @Provides
     @ScreenScoped
     public Viewport viewport(GameConfig config) {
-        return new FitViewport(config.width, config.height);
+        return new FitViewport(config.display.width, config.display.height);
     }
 
     @Provides
@@ -71,15 +74,8 @@ public class LevelModule {
 
     @Provides
     @ScreenScoped
-    @Gravity
-    public Vector2 gravity() {
-        return new Vector2(0f, -10f);
-    }
-
-    @Provides
-    @ScreenScoped
-    public World world(@Gravity Vector2 gravity) {
-        return new World(gravity, true);
+    public World world(GameConfig config) {
+        return new World(config.physics.gravity, true);
     }
 
     @Provides
@@ -89,7 +85,10 @@ public class LevelModule {
     }
 
     @Provides
-    public GameConfig worldConfig() {
-        return new GameConfig(16f, 9f, 1f / 16f);
+    public GameConfig gameConfig() {
+        return new GameConfig(
+                new GameConfig.Display(16f, 9f, 1f / 16f),
+                new GameConfig.Physics(new Vector2(0f, -10f)),
+                new GameConfig.Player(4f, 0.5f, 5f, 0.2f));
     }
 }

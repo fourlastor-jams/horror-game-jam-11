@@ -7,10 +7,11 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import javax.inject.Inject;
 
-public abstract class OnGround extends HorizontalMovement {
-
-    public OnGround(
+public class FallingFromGround extends Falling {
+    @Inject
+    public FallingFromGround(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
@@ -20,20 +21,11 @@ public abstract class OnGround extends HorizontalMovement {
     }
 
     @Override
-    public final void update(Entity entity) {
-        if (inputs.get(entity).jumpJustPressed) {
-            PlayerComponent player = players.get(entity);
-            player.stateMachine.changeState(player.jumping);
-            return;
-        }
-        if (bodies.get(entity).body.getLinearVelocity().y < 0f) {
-            PlayerComponent player = players.get(entity);
-            player.stateMachine.changeState(player.fallingFromGround);
-            return;
-        }
+    public void update(Entity entity) {
         super.update(entity);
-        groundUpdate(entity);
+        if (inputs.get(entity).jumpJustPressed && fallingTime() < config.player.fallingGraceTime) {
+            PlayerComponent playerComponent = players.get(entity);
+            playerComponent.stateMachine.changeState(playerComponent.jumping);
+        }
     }
-
-    abstract void groundUpdate(Entity entity);
 }

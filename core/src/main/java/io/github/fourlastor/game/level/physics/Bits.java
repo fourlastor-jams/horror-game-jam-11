@@ -3,11 +3,9 @@ package io.github.fourlastor.game.level.physics;
 public class Bits {
 
     public enum Category {
-        BODY,
-        GROUND,
-        SHADOW,
-        HITBOX,
-        HURTBOX;
+        PLAYER,
+        PLAYER_FOOT,
+        GROUND;
         public final short bits;
 
         Category() {
@@ -16,12 +14,9 @@ public class Bits {
     }
 
     public enum Mask {
-        BODY(Category.SHADOW, Category.GROUND),
-        GROUND(Category.BODY),
-        SHADOW(Category.BODY),
-        HITBOX(Category.HURTBOX),
-        HURTBOX(Category.HITBOX),
-        DISABLED();
+        PLAYER(Category.GROUND),
+        PLAYER_FOOT(Category.GROUND),
+        GROUND(Category.PLAYER, Category.PLAYER_FOOT);
 
         public final short bits;
 

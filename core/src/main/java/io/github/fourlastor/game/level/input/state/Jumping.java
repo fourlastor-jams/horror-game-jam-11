@@ -2,71 +2,79 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import io.github.fourlastor.game.level.PlayerAnimationsFactory;
-import io.github.fourlastor.game.level.component.AnimatedImageComponent;
+import io.github.fourlastor.game.level.GameConfig;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.game.level.di.Gravity;
-import io.github.fourlastor.harlequin.animation.Animation;
 import javax.inject.Inject;
-import javax.inject.Named;
 
-public class Jumping extends InputState {
+public class Jumping extends HorizontalMovement {
 
-    private static final float MAX_JUMP_HEIGHT = 7f;
-    public static final float MIN_JUMP_HEIGHT = 2.5f;
-    private final Animation<Drawable> animation;
-    private final float gravity;
-    private AssetManager assetManager;
+    private final GameConfig config;
+
+    private float initialY;
 
     @Inject
     public Jumping(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
-            ComponentMapper<AnimatedImageComponent> images,
-            @Named(PlayerAnimationsFactory.ANIMATION_JUMPING) Animation<Drawable> animation,
-            @Gravity Vector2 gravity,
-            AssetManager assetManager) {
-        super(players, bodies, images);
-        this.animation = animation;
-        this.gravity = Math.abs(gravity.y);
-        this.assetManager = assetManager;
+            ComponentMapper<AnimatedComponent> animated,
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
+        super(players, bodies, animated, inputs, config);
+        this.config = config;
     }
 
     @Override
-    protected Animation<Drawable> animation() {
-        return animation;
+    protected String animation() {
+        return "jump";
     }
 
     @Override
     public void enter(Entity entity) {
         super.enter(entity);
         Body body = bodies.get(entity).body;
-        float charge = players.get(entity).charge;
-        float targetHeight = Math.max(MIN_JUMP_HEIGHT, MAX_JUMP_HEIGHT * charge);
-        float velocity = (float) Math.sqrt(2f * targetHeight * gravity);
-        body.setLinearVelocity(body.getLinearVelocity().x / 3f, velocity);
-
-        playRandomSound(assetManager);
+        setVerticalVelocity(body, calculateVerticalVelocityForHeight(config.player.maxJumpHeight));
+        initialY = body.getPosition().y;
     }
 
     @Override
     public void update(Entity entity) {
-        if (bodies.get(entity).body.getLinearVelocity().y <= 0) {
-            PlayerComponent player = players.get(entity);
-            player.stateMachine.changeState(player.falling);
+        super.update(entity);
+        Body body = bodies.get(entity).body;
+        float distanceTravelled = Math.abs(body.getPosition().y - initialY);
+        if (config.player.minJumpHeight <= distanceTravelled && !inputs.get(entity).jumpPressed) {
+            setVerticalVelocity(body, 0f);
+        }
+        if (body.getLinearVelocity().y <= 0f) {
+            PlayerComponent playerComponent = players.get(entity);
+            playerComponent.stateMachine.changeState(playerComponent.fallingFromJump);
         }
     }
 
-    private void playRandomSound(AssetManager assetManager) {
-        int random = MathUtils.random(0, 4);
-        Sound sound = assetManager.get("audio/sounds/jumping/jump_" + random + ".wav", Sound.class);
-        sound.play();
+    private void setVerticalVelocity(Body body, float vY) {
+        body.setLinearVelocity(body.getLinearVelocity().x, vY);
+    }
+
+    /** @see <a href="http://www.iforce2d.net/b2dtut/projected-trajectory">Box2D projected trajectory</a> */
+    float calculateVerticalVelocityForHeight(float desiredHeight) {
+        if (desiredHeight <= 0) return 0;
+
+        // gravity is given per second, but we want time step values here
+        float t = 1 / 60.0f;
+        float stepGravity = config.physics.gravity.y * t * t; // m/s/s
+
+        // quadratic equation setup (ax² + bx + c = 0)
+        float a = 0.5f / stepGravity;
+        float b = 0.5f;
+        @SuppressWarnings("UnnecessaryLocalVariable") // names
+        float c = desiredHeight;
+
+        float quadraticSolution = Math.abs((float) ((-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)));
+
+        // convert answer back to seconds
+        return quadraticSolution * 60.0f;
     }
 }

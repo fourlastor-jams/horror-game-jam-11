@@ -2,34 +2,38 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.Message;
-import io.github.fourlastor.game.level.PlayerAnimationsFactory;
-import io.github.fourlastor.game.level.component.AnimatedImageComponent;
+import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
+import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.harlequin.animation.Animation;
-import javax.inject.Inject;
-import javax.inject.Named;
 
-public class Falling extends InputState {
+abstract class Falling extends HorizontalMovement {
 
-    private static final float GRACE_TIME = 0.3f;
-    private final Animation<Drawable> animation;
-    private float attemptedTime;
-    private float fallingTime;
+    protected final GameConfig config;
 
-    @Inject
+    private float fallingTime = 0f;
+    private float attemptedTime = -1;
+
     public Falling(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
-            ComponentMapper<AnimatedImageComponent> images,
-            @Named(PlayerAnimationsFactory.ANIMATION_FALLING) Animation<Drawable> animation) {
-        super(players, bodies, images);
-        this.animation = animation;
+            ComponentMapper<AnimatedComponent> animated,
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
+        super(players, bodies, animated, inputs, config);
+        this.config = config;
+    }
+
+    protected final float fallingTime() {
+        return fallingTime;
+    }
+
+    @Override
+    protected String animation() {
+        return "fall";
     }
 
     @Override
@@ -42,40 +46,23 @@ public class Falling extends InputState {
     @Override
     public void update(Entity entity) {
         super.update(entity);
-        fallingTime += Gdx.graphics.getDeltaTime();
-    }
-
-    @Override
-    protected Animation<Drawable> animation() {
-        return animation;
+        fallingTime += delta();
+        if (inputs.get(entity).jumpJustPressed) {
+            attemptedTime = fallingTime;
+        }
     }
 
     @Override
     public boolean onMessage(Entity entity, Telegram telegram) {
         if (telegram.message == Message.PLAYER_ON_GROUND.ordinal()) {
-            PlayerComponent player = players.get(entity);
-            if (attemptedTime > 0 && fallingTime - attemptedTime < GRACE_TIME) {
-                player.stateMachine.changeState(player.chargeJump);
+            PlayerComponent playerComponent = players.get(entity);
+            if (attemptedTime >= 0 && fallingTime - attemptedTime < config.player.fallingGraceTime) {
+                playerComponent.stateMachine.changeState(playerComponent.jumping);
             } else {
-                player.stateMachine.changeState(player.onGround);
+                playerComponent.stateMachine.changeState(playerComponent.idle);
             }
             return true;
         }
-        return false;
-    }
-
-    @Override
-    public boolean keyDown(Entity entity, int keycode) {
-        if (keycode == Input.Keys.SPACE) {
-            attemptedTime = fallingTime;
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(Entity entity, int screenX, int screenY, int pointer, int button) {
-        attemptedTime = fallingTime;
-        return true;
+        return super.onMessage(entity, telegram);
     }
 }
