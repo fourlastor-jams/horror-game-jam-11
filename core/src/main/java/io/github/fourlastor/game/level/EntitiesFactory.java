@@ -18,6 +18,7 @@ import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
+import io.github.fourlastor.game.level.physics.Bits;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 import io.github.fourlastor.ldtk.model.LdtkDefinitions;
@@ -27,9 +28,10 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
+
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
 
 /**
  * Factory to create various entities: player, buildings, enemies..
@@ -96,6 +98,8 @@ public class EntitiesFactory {
                     def.type = BodyDef.BodyType.StaticBody;
                     Body body = world.createBody(def);
                     FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
                     ChainShape shape = new ChainShape();
                     shape.createLoop(vertices);
                     fixtureDef.shape = shape;
@@ -132,8 +136,10 @@ public class EntitiesFactory {
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
-            fixtureDef.shape = shape;
             shape.setAsBox(halfWidth, halfHeight);
+            fixtureDef.shape = shape;
+            fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
+            fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
             body.createFixture(fixtureDef);
             shape.dispose();
             return body;

@@ -14,8 +14,10 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
+
 import javax.inject.Inject;
 
 public class PhysicsSystem extends IntervalSystem {
@@ -110,19 +112,17 @@ public class PhysicsSystem extends IntervalSystem {
         public void beginContact(Contact contact) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
-            if (isHitbox(fixtureA) && isHurtbox(fixtureB)) {
-                propagateHit(fixtureA, fixtureB);
-            } else if (isHurtbox(fixtureA) && isHitbox(fixtureB)) {
-                propagateHit(fixtureB, fixtureA);
+            if (isPlayer(fixtureA) && isGround(fixtureB) || isGround(fixtureA) && isPlayer(fixtureB)) {
+                propagateOnGround();
             }
         }
 
-        private boolean isHurtbox(Fixture fixture) {
-            return fixture.getFilterData().categoryBits == Bits.Category.HURTBOX.bits;
+        private boolean isGround(Fixture fixture) {
+            return fixture.getFilterData().categoryBits == Bits.Category.GROUND.bits;
         }
 
-        private boolean isHitbox(Fixture fixture) {
-            return fixture.getFilterData().categoryBits == Bits.Category.HITBOX.bits;
+        private boolean isPlayer(Fixture fixture) {
+            return fixture.getFilterData().categoryBits == Bits.Category.PLAYER.bits;
         }
 
         @Override
@@ -130,29 +130,13 @@ public class PhysicsSystem extends IntervalSystem {
 
         @Override
         public void preSolve(Contact contact, Manifold oldManifold) {
-            Fixture fixtureA = contact.getFixtureA();
-            Fixture fixtureB = contact.getFixtureB();
-            //            if (fixtureA.getUserData() == fixtureB.getUserData()) {
-            //                contact.setEnabled(false);
-            //            }
         }
 
         @Override
         public void postSolve(Contact contact, ContactImpulse impulse) {}
     };
 
-    private void propagateHit(@SuppressWarnings("unused") Fixture hitbox, Fixture hurtbox) {
-        Object hitUserData = hitbox.getUserData();
-        Object hurtUserData = hurtbox.getUserData();
-        if (!(hurtUserData instanceof Entity) || !(hitUserData instanceof Entity)) {
-            return;
-        }
-        Entity hurt = (Entity) hurtUserData;
-        Entity hit = (Entity) hitUserData;
-        //
-        //        messageDispatcher.dispatchMessage(Message.PLAYER_HIT.ordinal(), new HurtData(
-        //                hurt,
-        //                hit.getComponent(PlayerComponent.class).fighter.damage
-        //        ));
+    private void propagateOnGround() {
+        messageDispatcher.dispatchMessage(Message.PLAYER_ON_GROUND.ordinal());
     }
 }

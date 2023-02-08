@@ -48,7 +48,7 @@ public class Jumping extends HorizontalMovement {
         }
         if (body.getLinearVelocity().y <= 0f) {
             PlayerComponent playerComponent = players.get(entity);
-            playerComponent.stateMachine.changeState(playerComponent.idle);
+            playerComponent.stateMachine.changeState(playerComponent.fallingFromJump);
         }
     }
 
