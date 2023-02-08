@@ -26,7 +26,7 @@ public abstract class OnGround extends HorizontalMovement {
             player.stateMachine.changeState(player.jumping);
             return;
         }
-        if (bodies.get(entity).body.getLinearVelocity().y < 0f) {
+        if (bodies.get(entity).body.getLinearVelocity().y < -0.1f) {
             PlayerComponent player = players.get(entity);
             player.stateMachine.changeState(player.fallingFromGround);
             return;
