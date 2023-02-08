@@ -112,7 +112,7 @@ public class PhysicsSystem extends IntervalSystem {
         public void beginContact(Contact contact) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
-            if (isPlayer(fixtureA) && isGround(fixtureB) || isGround(fixtureA) && isPlayer(fixtureB)) {
+            if (isPlayerFoot(fixtureA) && isGround(fixtureB) || isGround(fixtureA) && isPlayerFoot(fixtureB)) {
                 propagateOnGround();
             }
         }
@@ -121,8 +121,8 @@ public class PhysicsSystem extends IntervalSystem {
             return fixture.getFilterData().categoryBits == Bits.Category.GROUND.bits;
         }
 
-        private boolean isPlayer(Fixture fixture) {
-            return fixture.getFilterData().categoryBits == Bits.Category.PLAYER.bits;
+        private boolean isPlayerFoot(Fixture fixture) {
+            return fixture.getFilterData().categoryBits == Bits.Category.PLAYER_FOOT.bits;
         }
 
         @Override

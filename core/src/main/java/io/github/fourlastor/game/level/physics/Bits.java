@@ -4,6 +4,7 @@ public class Bits {
 
     public enum Category {
         PLAYER,
+        PLAYER_FOOT,
         GROUND;
         public final short bits;
 
@@ -14,7 +15,8 @@ public class Bits {
 
     public enum Mask {
         PLAYER(Category.GROUND),
-        GROUND(Category.PLAYER);
+        PLAYER_FOOT(Category.GROUND),
+        GROUND(Category.PLAYER, Category.PLAYER_FOOT);
 
         public final short bits;
 
