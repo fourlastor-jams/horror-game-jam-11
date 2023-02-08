@@ -23,7 +23,7 @@ abstract class Falling extends HorizontalMovement {
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
             ComponentMapper<InputComponent> inputs, GameConfig config) {
-        super(players, bodies, animated, inputs);
+        super(players, bodies, animated, inputs, config);
         this.config = config;
     }
 

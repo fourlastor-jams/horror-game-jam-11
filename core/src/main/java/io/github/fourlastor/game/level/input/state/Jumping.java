@@ -22,7 +22,7 @@ public class Jumping extends HorizontalMovement {
             ComponentMapper<AnimatedComponent> animated,
             ComponentMapper<InputComponent> inputs,
             GameConfig config) {
-        super(players, bodies, animated, inputs);
+        super(players, bodies, animated, inputs, config);
         this.config = config;
     }
 
@@ -36,7 +36,7 @@ public class Jumping extends HorizontalMovement {
     public void enter(Entity entity) {
         super.enter(entity);
         Body body = bodies.get(entity).body;
-        setVerticalVelocity(body, calculateVerticalVelocityForHeight(5f));
+        setVerticalVelocity(body, calculateVerticalVelocityForHeight(config.jumpHeight));
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.github.fourlastor.game.level.input.state;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Body;
+import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
@@ -10,15 +11,17 @@ import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
 public abstract class HorizontalMovement extends CharacterState {
-    private static final float VELOCITY = 4f;
+    private final GameConfig config;
     private float velocity = 0f;
 
     public HorizontalMovement(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs) {
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
         super(players, bodies, animated, inputs);
+        this.config = config;
     }
 
     @Override
@@ -27,7 +30,7 @@ public abstract class HorizontalMovement extends CharacterState {
         boolean goingLeft = input.leftPressed;
         boolean goingRight = input.rightPressed;
         if (goingLeft || goingRight) {
-            velocity = goingLeft ? -VELOCITY : VELOCITY;
+            velocity = goingLeft ? -config.movementSpeed : config.movementSpeed;
             AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
             float scale = Math.abs(stateMachine.getScaleX());
             stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));

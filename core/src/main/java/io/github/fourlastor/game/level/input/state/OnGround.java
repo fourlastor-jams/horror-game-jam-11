@@ -2,6 +2,7 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
@@ -13,8 +14,8 @@ public abstract class OnGround extends HorizontalMovement {
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs) {
-        super(players, bodies, animated, inputs);
+            ComponentMapper<InputComponent> inputs, GameConfig config) {
+        super(players, bodies, animated, inputs, config);
     }
 
     @Override
