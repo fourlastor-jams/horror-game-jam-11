@@ -138,6 +138,7 @@ public class EntitiesFactory {
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(halfWidth, halfHeight);
             fixtureDef.shape = shape;
+            fixtureDef.friction = 0f;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
             body.createFixture(fixtureDef);
