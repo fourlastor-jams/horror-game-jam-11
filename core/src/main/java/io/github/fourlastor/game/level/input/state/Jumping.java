@@ -15,6 +15,8 @@ public class Jumping extends HorizontalMovement {
 
     private final GameConfig config;
 
+    private float initialY;
+
     @Inject
     public Jumping(
             ComponentMapper<PlayerComponent> players,
@@ -36,14 +38,16 @@ public class Jumping extends HorizontalMovement {
     public void enter(Entity entity) {
         super.enter(entity);
         Body body = bodies.get(entity).body;
-        setVerticalVelocity(body, calculateVerticalVelocityForHeight(config.player.jumpHeight));
+        setVerticalVelocity(body, calculateVerticalVelocityForHeight(config.player.maxJumpHeight));
+        initialY = body.getPosition().y;
     }
 
     @Override
     public void update(Entity entity) {
         super.update(entity);
         Body body = bodies.get(entity).body;
-        if (!inputs.get(entity).jumpPressed) {
+        float distanceTravelled = Math.abs(body.getPosition().y - initialY);
+        if (config.player.minJumpHeight <= distanceTravelled && !inputs.get(entity).jumpPressed) {
             setVerticalVelocity(body, 0f);
         }
         if (body.getLinearVelocity().y <= 0f) {
