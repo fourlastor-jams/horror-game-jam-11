@@ -50,7 +50,7 @@ public class LevelModule {
         engine.addSystem(actorFollowBodySystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        //        engine.addSystem(physicsDebugSystem);
+        engine.addSystem(physicsDebugSystem);
         return engine;
     }
 
@@ -74,15 +74,8 @@ public class LevelModule {
 
     @Provides
     @ScreenScoped
-    @Gravity
-    public Vector2 gravity() {
-        return new Vector2(0f, -10f);
-    }
-
-    @Provides
-    @ScreenScoped
-    public World world(@Gravity Vector2 gravity) {
-        return new World(gravity, true);
+    public World world(GameConfig config) {
+        return new World(config.gravity, true);
     }
 
     @Provides
@@ -92,7 +85,7 @@ public class LevelModule {
     }
 
     @Provides
-    public GameConfig worldConfig() {
-        return new GameConfig(16f, 9f, 1f / 16f);
+    public GameConfig gameConfig() {
+        return new GameConfig(16f, 9f, 1f / 16f, new Vector2(0f, -10f));
     }
 }

@@ -2,7 +2,6 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.graphics.Camera;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
@@ -16,9 +15,8 @@ public class Running extends OnGround {
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs,
-            Camera camera) {
-        super(players, bodies, animated, inputs, camera);
+            ComponentMapper<InputComponent> inputs) {
+        super(players, bodies, animated, inputs);
     }
 
     @Override

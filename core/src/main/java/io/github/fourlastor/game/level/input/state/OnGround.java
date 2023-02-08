@@ -2,7 +2,6 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
@@ -14,17 +13,14 @@ import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
 public abstract class OnGround extends CharacterState {
     private static final float VELOCITY = 4f;
-    private final Camera camera;
     private final Vector2 velocity = Vector2.Zero.cpy();
 
     public OnGround(
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs,
-            Camera camera) {
+            ComponentMapper<InputComponent> inputs) {
         super(players, bodies, animated, inputs);
-        this.camera = camera;
     }
 
     @Override
@@ -57,14 +53,8 @@ public abstract class OnGround extends CharacterState {
 
     private void updateBodyVelocity(Entity entity) {
         Body body = bodies.get(entity).body;
-        boolean goingLeft = velocity.x < 0;
-        boolean atLeftLimit = body.getPosition().x - 1 <= camera.position.x - camera.viewportWidth / 2f;
-        boolean atRightLimit = body.getPosition().x + 1 >= camera.position.x + camera.viewportWidth / 2f;
-        if ((goingLeft && atLeftLimit) || (!goingLeft && atRightLimit)) {
-            body.setLinearVelocity(Vector2.Zero);
-        } else {
-            body.setLinearVelocity(velocity);
-        }
+        float yVelocity = body.getLinearVelocity().y;
+        body.setLinearVelocity(velocity.x, yVelocity);
     }
 
     protected final boolean isMoving() {
