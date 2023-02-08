@@ -8,7 +8,6 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-
 import javax.inject.Inject;
 
 public class Jumping extends HorizontalMovement {
@@ -20,7 +19,8 @@ public class Jumping extends HorizontalMovement {
             ComponentMapper<PlayerComponent> players,
             ComponentMapper<BodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs, GameConfig config) {
+            ComponentMapper<InputComponent> inputs,
+            GameConfig config) {
         super(players, bodies, animated, inputs);
         this.config = config;
     }
@@ -51,24 +51,22 @@ public class Jumping extends HorizontalMovement {
     }
 
     /** @see <a href="http://www.iforce2d.net/b2dtut/projected-trajectory">Box2D projected trajectory</a> */
-    float calculateVerticalVelocityForHeight( float desiredHeight )
-    {
-        if ( desiredHeight <= 0 )
-            return 0;
+    float calculateVerticalVelocityForHeight(float desiredHeight) {
+        if (desiredHeight <= 0) return 0;
 
-        //gravity is given per second, but we want time step values here
+        // gravity is given per second, but we want time step values here
         float t = 1 / 60.0f;
-        float stepGravity = config.gravity.y  * t * t; // m/s/s
+        float stepGravity = config.gravity.y * t * t; // m/s/s
 
-        //quadratic equation setup (ax² + bx + c = 0)
+        // quadratic equation setup (ax² + bx + c = 0)
         float a = 0.5f / stepGravity;
         float b = 0.5f;
         @SuppressWarnings("UnnecessaryLocalVariable") // names
         float c = desiredHeight;
 
-        float quadraticSolution = Math.abs((float) (( -b - Math.sqrt( b*b - 4*a*c ) ) / (2*a)));
+        float quadraticSolution = Math.abs((float) ((-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)));
 
-        //convert answer back to seconds
+        // convert answer back to seconds
         return quadraticSolution * 60.0f;
     }
 }

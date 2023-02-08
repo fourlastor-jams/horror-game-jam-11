@@ -13,7 +13,11 @@ public abstract class HorizontalMovement extends CharacterState {
     private static final float VELOCITY = 4f;
     private float velocity = 0f;
 
-    public HorizontalMovement(ComponentMapper<PlayerComponent> players, ComponentMapper<BodyComponent> bodies, ComponentMapper<AnimatedComponent> animated, ComponentMapper<InputComponent> inputs) {
+    public HorizontalMovement(
+            ComponentMapper<PlayerComponent> players,
+            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<AnimatedComponent> animated,
+            ComponentMapper<InputComponent> inputs) {
         super(players, bodies, animated, inputs);
     }
 

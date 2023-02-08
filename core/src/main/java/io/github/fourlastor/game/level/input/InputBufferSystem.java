@@ -9,7 +9,6 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
-
 import javax.inject.Inject;
 
 public class InputBufferSystem extends IntervalSystem {
