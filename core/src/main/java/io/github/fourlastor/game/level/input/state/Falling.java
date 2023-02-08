@@ -11,6 +11,9 @@ import io.github.fourlastor.game.level.component.PlayerComponent;
 
 abstract class Falling extends HorizontalMovement {
 
+    private float fallingTime = 0f;
+    private float attemptedTime = -1;
+
 
     public Falling(
             ComponentMapper<PlayerComponent> players,
@@ -26,10 +29,30 @@ abstract class Falling extends HorizontalMovement {
     }
 
     @Override
+    public void enter(Entity entity) {
+        super.enter(entity);
+        fallingTime = 0f;
+        attemptedTime = -1f;
+    }
+
+    @Override
+    public void update(Entity entity) {
+        super.update(entity);
+        fallingTime += delta();
+        if (inputs.get(entity).jumpJustPressed) {
+            attemptedTime = fallingTime;
+        }
+    }
+
+    @Override
     public boolean onMessage(Entity entity, Telegram telegram) {
         if (telegram.message == Message.PLAYER_ON_GROUND.ordinal()) {
             PlayerComponent playerComponent = players.get(entity);
-            playerComponent.stateMachine.changeState(playerComponent.idle);
+            if (attemptedTime >= 0 && fallingTime - attemptedTime < 0.2f) {
+                playerComponent.stateMachine.changeState(playerComponent.jumping);
+            } else {
+                playerComponent.stateMachine.changeState(playerComponent.idle);
+            }
             return true;
         }
         return super.onMessage(entity, telegram);
