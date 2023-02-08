@@ -33,7 +33,7 @@ public abstract class OnGround extends CharacterState {
     @Override
     public void update(Entity entity) {
         Command command = inputs.get(entity).command;
-        if (command == Command.ATTACK) {
+        if (command == Command.JUMP) {
             PlayerComponent player = players.get(entity);
             player.stateMachine.changeState(player.jumping);
             return;

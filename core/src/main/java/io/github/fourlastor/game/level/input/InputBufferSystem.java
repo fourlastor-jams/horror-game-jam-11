@@ -10,6 +10,7 @@ import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.input.controls.Command;
 import io.github.fourlastor.game.level.input.controls.Controls;
+
 import javax.inject.Inject;
 
 public class InputBufferSystem extends IntervalSystem {
@@ -34,7 +35,7 @@ public class InputBufferSystem extends IntervalSystem {
             Controls controls = players.get(entity).controls;
             InputComponent inputComponent = inputs.get(entity);
             if (controls.attack().pressed()) {
-                inputComponent.command = Command.ATTACK;
+                inputComponent.command = Command.JUMP;
             } else if (controls.left().pressed()) {
                 inputComponent.command = Command.LEFT;
             } else if (controls.right().pressed()) {
