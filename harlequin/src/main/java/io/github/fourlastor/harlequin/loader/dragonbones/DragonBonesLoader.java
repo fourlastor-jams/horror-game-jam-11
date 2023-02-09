@@ -55,6 +55,7 @@ public class DragonBonesLoader
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"}) // overridden method
     @Override
     public Array<AssetDescriptor> getDependencies(
             String fileName, FileHandle file, AssetLoaderParameters<AnimationNode.Group> parameter) {
