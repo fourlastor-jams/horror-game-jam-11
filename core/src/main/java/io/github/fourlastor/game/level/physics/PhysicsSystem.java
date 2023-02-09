@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
-
 import javax.inject.Inject;
 
 public class PhysicsSystem extends IntervalSystem {

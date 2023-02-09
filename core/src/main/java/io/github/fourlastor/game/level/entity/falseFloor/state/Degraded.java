@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
-
 import javax.inject.Inject;
 
 public class Degraded extends FalseFloorState {

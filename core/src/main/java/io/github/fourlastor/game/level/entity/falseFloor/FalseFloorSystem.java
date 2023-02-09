@@ -13,7 +13,6 @@ import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Degraded;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Degrading;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Intact;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
-
 import javax.inject.Inject;
 
 public class Degrading extends FalseFloorState {

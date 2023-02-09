@@ -7,7 +7,6 @@ import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
-
 import javax.inject.Inject;
 
 public class Intact extends FalseFloorState {
