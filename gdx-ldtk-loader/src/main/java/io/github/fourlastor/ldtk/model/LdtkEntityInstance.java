@@ -5,9 +5,8 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 import io.github.fourlastor.json.JsonParser;
-
-import javax.inject.Inject;
 import java.util.List;
+import javax.inject.Inject;
 
 public class LdtkEntityInstance {
 

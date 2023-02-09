@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 458364,
-	"nextUid": 84,
+	"nextUid": 85,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -742,6 +742,34 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "False_floor",
+			"uid": 84,
+			"tags": [],
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#94D9B3",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 80,
+			"tileId": 4,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 80, "x": 64, "y": 0, "w": 16, "h": 16 },
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -1064,6 +1092,48 @@
 							"height": 16,
 							"defUid": 81,
 							"px": [464,256],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "False_floor",
+							"__grid": [40,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 80, "x": 64, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#94D9B3",
+							"iid": "eacae020-9f30-11ed-890c-8193b2675270",
+							"width": 16,
+							"height": 16,
+							"defUid": 84,
+							"px": [640,208],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "False_floor",
+							"__grid": [41,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 80, "x": 64, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#94D9B3",
+							"iid": "eb1ea570-9f30-11ed-890c-5b39e0963525",
+							"width": 16,
+							"height": 16,
+							"defUid": 84,
+							"px": [656,208],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "False_floor",
+							"__grid": [42,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 80, "x": 64, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#94D9B3",
+							"iid": "ec7d9930-9f30-11ed-890c-715936aaff05",
+							"width": 16,
+							"height": 16,
+							"defUid": 84,
+							"px": [672,208],
 							"fieldInstances": []
 						}
 					]

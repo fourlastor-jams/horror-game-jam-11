@@ -3,7 +3,6 @@ package io.github.fourlastor.ldtk.model;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonValue;
 import io.github.fourlastor.json.JsonParser;
-
 import javax.inject.Inject;
 
 public class LdtkTileInstance {

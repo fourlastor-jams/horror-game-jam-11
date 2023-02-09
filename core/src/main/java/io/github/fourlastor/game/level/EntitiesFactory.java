@@ -29,11 +29,10 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.inject.Inject;
 
 /**
  * Factory to create various entities: player, buildings, enemies..
@@ -223,6 +222,55 @@ public class EntitiesFactory {
                             0f);
                     fixtureDef.shape = shape;
                     fixtureDef.isSensor = true;
+                    body.createFixture(fixtureDef);
+                    return body;
+                }));
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public List<Entity> falseFloors() {
+        float scale = config.display.scale;
+        LdtkLayerInstance entityLayer = entityLayer();
+        List<Entity> entities = new ArrayList<>();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if ("False_floor".equals(instance.identifier)) {
+                Entity entity = new Entity();
+                String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
+                Image actor = new Image(atlas.findRegion("entities/" + tileName));
+                actor.setScale(scale);
+                float x = instance.x();
+                float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
+                actor.setPosition(x * scale, y * scale);
+                entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
+                entity.add(new BodyBuilderComponent(world -> {
+                    BodyDef def = new BodyDef();
+                    def.type = BodyDef.BodyType.StaticBody;
+                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
+                    Body body = world.createBody(def);
+                    FixtureDef fixtureDef = new FixtureDef();
+
+                    ChainShape shape = new ChainShape();
+
+                    float centerAdjustX = instance.halfWidth() * scale;
+                    float centerAdjustY = instance.halfHeight() * scale * 3f / 16f;
+
+                    float[] vertices = new float[] {
+                        -centerAdjustX,
+                        -centerAdjustY,
+                        -centerAdjustX,
+                        centerAdjustY,
+                        centerAdjustX,
+                        centerAdjustY,
+                        centerAdjustX,
+                        -centerAdjustY,
+                    };
+                    shape.createLoop(vertices);
+                    fixtureDef.shape = shape;
+                    fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
                     body.createFixture(fixtureDef);
                     return body;
                 }));
