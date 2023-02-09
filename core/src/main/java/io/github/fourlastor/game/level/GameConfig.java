@@ -42,7 +42,12 @@ public class GameConfig {
         public final float fallingGraceTime;
         public final Vector2 antiGravity;
 
-        public Player(float movementSpeed, float minJumpHeight, float maxJumpHeight, float fallingGraceTime, Vector2 antiGravity) {
+        public Player(
+                float movementSpeed,
+                float minJumpHeight,
+                float maxJumpHeight,
+                float fallingGraceTime,
+                Vector2 antiGravity) {
             this.movementSpeed = movementSpeed;
             this.minJumpHeight = minJumpHeight;
             this.maxJumpHeight = maxJumpHeight;

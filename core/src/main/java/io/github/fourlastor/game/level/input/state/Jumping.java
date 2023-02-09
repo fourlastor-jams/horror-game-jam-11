@@ -8,7 +8,6 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-
 import javax.inject.Inject;
 
 public class Jumping extends HorizontalMovement {
