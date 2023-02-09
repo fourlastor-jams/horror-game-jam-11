@@ -43,7 +43,7 @@ public abstract class HorizontalMovement extends CharacterState {
             float scale = Math.abs(stateMachine.getScaleX());
             stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));
         } else {
-            float target = Math.signum(velocity) * 4f;
+            float target = Math.signum(velocity) * config.player.movementSpeed;
             velocity = Interpolation.exp5.apply(1 - progress) * target;
         }
         updateBodyVelocity(entity);
