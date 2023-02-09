@@ -24,6 +24,8 @@ public class PlayerComponent implements Component {
     public final FallingFromGround fallingFromGround;
     public final Dead dead;
 
+    public float movementTime = 0;
+
     public PlayerComponent(
             Controls controls,
             CharacterStateMachine stateMachine,

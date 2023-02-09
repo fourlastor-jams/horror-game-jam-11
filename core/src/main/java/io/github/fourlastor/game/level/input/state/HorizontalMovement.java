@@ -2,6 +2,7 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.physics.box2d.Body;
 import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
@@ -27,15 +28,23 @@ public abstract class HorizontalMovement extends CharacterState {
     @Override
     public void update(Entity entity) {
         InputComponent input = inputs.get(entity);
+        PlayerComponent playerComponent = players.get(entity);
+        if (input.movementChanged) {
+            playerComponent.movementTime = 0f;
+        }
+        playerComponent.movementTime += delta();
+        float progress = Math.min(1f, playerComponent.movementTime / config.player.accelerationTime);
         boolean goingLeft = input.leftPressed;
         boolean goingRight = input.rightPressed;
         if (goingLeft || goingRight) {
-            velocity = goingLeft ? -config.player.movementSpeed : config.player.movementSpeed;
+            float target = goingLeft ? -config.player.movementSpeed : config.player.movementSpeed;
+            velocity = Interpolation.exp5.apply(progress) * target;
             AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
             float scale = Math.abs(stateMachine.getScaleX());
             stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));
         } else {
-            velocity = 0f;
+            float target = Math.signum(velocity) * config.player.movementSpeed;
+            velocity = Interpolation.exp5.apply(1 - progress) * target;
         }
         updateBodyVelocity(entity);
     }
