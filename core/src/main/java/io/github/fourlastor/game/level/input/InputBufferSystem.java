@@ -8,6 +8,7 @@ import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import io.github.fourlastor.game.level.input.controls.Control;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import javax.inject.Inject;
 
@@ -31,9 +32,18 @@ public class InputBufferSystem extends IntervalSystem {
     protected void updateInterval() {
         for (Entity entity : entities) {
             Controls controls = players.get(entity).controls;
+            Control jump = controls.jump();
+            Control left = controls.left();
+            Control right = controls.right();
             InputComponent input = inputs.get(entity);
-            input.jumpJustPressed = controls.jump().pressed() && !input.jumpPressed;
-            input.jumpPressed = controls.jump().pressed();
+            input.jumpJustPressed = jump.pressed() && !input.jumpPressed;
+            input.jumpPressed = jump.pressed();
+            boolean leftJustPressed = left.pressed() && !input.leftPressed;
+            boolean rightJustPressed = right.pressed() && !input.rightPressed;
+            boolean leftJustReleased = !left.pressed() && input.leftPressed;
+            boolean rightJustReleased = !right.pressed() && input.rightPressed;
+            boolean movementReleased = !left.pressed() && !right.pressed() && (leftJustReleased || rightJustReleased);
+            input.movementChanged = leftJustPressed || rightJustPressed || movementReleased;
             input.leftPressed = controls.left().pressed();
             input.rightPressed = controls.right().pressed();
         }
