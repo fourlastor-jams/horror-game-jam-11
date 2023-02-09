@@ -89,7 +89,7 @@ public class LevelModule {
         return new GameConfig(
                 new GameConfig.Display(16f, 9f, 1f / 16f),
                 new GameConfig.Physics(new Vector2(0f, -10f)),
-                new GameConfig.Player(6f, 1f, 4f, 0.2f, new Vector2(0f, -20f)),
+                new GameConfig.Player(8f, 1f, 4f, 0.2f, new Vector2(0f, -20f)),
                 new GameConfig.Entities(0.7f));
     }
 }
