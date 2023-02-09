@@ -89,6 +89,6 @@ public class LevelModule {
         return new GameConfig(
                 new GameConfig.Display(16f, 9f, 1f / 16f),
                 new GameConfig.Physics(new Vector2(0f, -10f)),
-                new GameConfig.Player(4f, 0.5f, 5f, 0.2f));
+                new GameConfig.Player(4f, 1f, 5f, 0.2f));
     }
 }
