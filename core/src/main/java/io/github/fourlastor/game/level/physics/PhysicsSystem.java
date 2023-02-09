@@ -111,8 +111,15 @@ public class PhysicsSystem extends IntervalSystem {
         public void beginContact(Contact contact) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
-            if (isPlayerFoot(fixtureA) && isGround(fixtureB) || isGround(fixtureA) && isPlayerFoot(fixtureB)) {
-                propagateOnGround();
+            if (isPlayerFoot(fixtureA) && isGround(fixtureB)) {
+                propagateOnGround(fixtureB.getUserData());
+            } else if (isGround(fixtureA) && isPlayerFoot(fixtureB)) {
+                propagateOnGround(fixtureA.getUserData());
+            }
+            if (isPlayer(fixtureA) && isSpike(fixtureB)) {
+                propagateOnSpike();
+            } else if (isSpike(fixtureA) && isPlayer(fixtureB)) {
+                propagateOnSpike();
             }
         }
 
@@ -122,6 +129,14 @@ public class PhysicsSystem extends IntervalSystem {
 
         private boolean isPlayerFoot(Fixture fixture) {
             return fixture.getFilterData().categoryBits == Bits.Category.PLAYER_FOOT.bits;
+        }
+
+        private boolean isSpike(Fixture fixture) {
+            return fixture.getFilterData().categoryBits == Bits.Category.SPIKE.bits;
+        }
+
+        private boolean isPlayer(Fixture fixture) {
+            return fixture.getFilterData().categoryBits == Bits.Category.PLAYER.bits;
         }
 
         @Override
@@ -134,7 +149,11 @@ public class PhysicsSystem extends IntervalSystem {
         public void postSolve(Contact contact, ContactImpulse impulse) {}
     };
 
-    private void propagateOnGround() {
-        messageDispatcher.dispatchMessage(Message.PLAYER_ON_GROUND.ordinal());
+    private void propagateOnGround(Object floorEntity) {
+        messageDispatcher.dispatchMessage(Message.PLAYER_ON_GROUND.ordinal(), floorEntity);
+    }
+
+    private void propagateOnSpike() {
+        messageDispatcher.dispatchMessage(Message.PLAYER_ON_SPIKE.ordinal());
     }
 }

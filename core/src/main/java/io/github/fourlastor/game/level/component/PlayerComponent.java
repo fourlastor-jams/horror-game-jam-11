@@ -3,6 +3,7 @@ package io.github.fourlastor.game.level.component;
 import com.badlogic.ashley.core.Component;
 import io.github.fourlastor.game.level.input.CharacterStateMachine;
 import io.github.fourlastor.game.level.input.controls.Controls;
+import io.github.fourlastor.game.level.input.state.Dead;
 import io.github.fourlastor.game.level.input.state.FallingFromGround;
 import io.github.fourlastor.game.level.input.state.FallingFromJump;
 import io.github.fourlastor.game.level.input.state.Idle;
@@ -21,6 +22,7 @@ public class PlayerComponent implements Component {
     public final Jumping jumping;
     public final FallingFromJump fallingFromJump;
     public final FallingFromGround fallingFromGround;
+    public final Dead dead;
 
     public PlayerComponent(
             Controls controls,
@@ -29,7 +31,8 @@ public class PlayerComponent implements Component {
             Running running,
             Jumping jumping,
             FallingFromJump fallingFromJump,
-            FallingFromGround fallingFromGround) {
+            FallingFromGround fallingFromGround,
+            Dead dead) {
         this.controls = controls;
         this.stateMachine = stateMachine;
         this.idle = idle;
@@ -37,5 +40,6 @@ public class PlayerComponent implements Component {
         this.jumping = jumping;
         this.fallingFromJump = fallingFromJump;
         this.fallingFromGround = fallingFromGround;
+        this.dead = dead;
     }
 }

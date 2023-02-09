@@ -12,6 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.GameConfig;
+import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorSystem;
 import io.github.fourlastor.game.level.input.CharacterStateSystem;
 import io.github.fourlastor.game.level.input.InputBufferSystem;
 import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
@@ -31,6 +32,7 @@ public class LevelModule {
     public Engine engine(
             InputBufferSystem inputBufferSystem,
             CharacterStateSystem characterStateSystem,
+            FalseFloorSystem falseFloorSystem,
             CameraMovementSystem cameraMovementSystem,
             PhysicsSystem physicsSystem,
             ActorFollowBodySystem actorFollowBodySystem,
@@ -44,13 +46,14 @@ public class LevelModule {
         engine.addSystem(movingSystem);
         engine.addSystem(inputBufferSystem);
         engine.addSystem(characterStateSystem);
+        engine.addSystem(falseFloorSystem);
         engine.addSystem(physicsSystem);
         engine.addSystem(soundSystem);
         engine.addSystem(cameraMovementSystem);
         engine.addSystem(actorFollowBodySystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        engine.addSystem(physicsDebugSystem);
+        //        engine.addSystem(physicsDebugSystem);
         return engine;
     }
 
@@ -89,6 +92,7 @@ public class LevelModule {
         return new GameConfig(
                 new GameConfig.Display(16f, 9f, 1f / 16f),
                 new GameConfig.Physics(new Vector2(0f, -10f)),
-                new GameConfig.Player(4f, 1f, 4f, 0.2f, new Vector2(0f, -20f)));
+                new GameConfig.Player(8f, 1f, 4f, 0.2f, new Vector2(0f, -20f)),
+                new GameConfig.Entities(0.7f));
     }
 }

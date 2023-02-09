@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,6 +19,7 @@ import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
+import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.physics.Bits;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
@@ -31,6 +33,7 @@ import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.inject.Inject;
 
 /**
@@ -58,6 +61,13 @@ public class EntitiesFactory {
         this.definitions = definitions;
         this.definition = definition;
         this.config = config;
+    }
+
+    @SuppressWarnings("unused") // dev only
+    public Entity origin() {
+        Entity entity = new Entity();
+        entity.add(new ActorComponent(new Image(atlas.findRegion("whitePixel")), ActorComponent.Layer.CHARACTER));
+        return entity;
     }
 
     public List<Entity> tiles() {
@@ -130,21 +140,21 @@ public class EntitiesFactory {
         entity.add(new BodyBuilderComponent(world -> {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.DynamicBody;
-            float halfWidth = playerSpawn.width / 2f * halfScale;
-            float halfHeight = playerSpawn.height / 2f * halfScale;
+            float halfWidth = playerSpawn.halfWidth() * halfScale;
+            float halfHeight = playerSpawn.halfHeight() * halfScale;
             def.position.set(
                     halfWidth + playerSpawn.x() * scale,
                     halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * scale);
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
-            shape.setAsBox(halfWidth, halfHeight);
+            shape.setAsBox(halfWidth, halfHeight, new Vector2(0f, -halfHeight), 0f);
             fixtureDef.shape = shape;
             fixtureDef.friction = 0f;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
             body.createFixture(fixtureDef);
-            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight), 0f);
+            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight * 2), 0f);
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER_FOOT.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER_FOOT.bits;
@@ -168,12 +178,111 @@ public class EntitiesFactory {
     }
 
     private LdtkLayerInstance entityLayer() {
-
         for (LdtkLayerInstance layerInstance : definition.layerInstances) {
             if ("Entities".equals(layerInstance.type)) {
                 return layerInstance;
             }
         }
         throw new IllegalStateException("Missing entities layer");
+    }
+
+    public List<Entity> spikes() {
+        float scale = config.display.scale;
+        LdtkLayerInstance entityLayer = entityLayer();
+        List<Entity> entities = new ArrayList<>();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if (instance.identifier.startsWith("Spike")) {
+                Entity entity = new Entity();
+                String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
+                Image actor = new Image(atlas.findRegion("entities/" + tileName));
+                actor.setScale(scale);
+                float x = instance.x();
+                float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
+                actor.setPosition(x * scale, y * scale);
+                entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
+                entity.add(new BodyBuilderComponent(world -> {
+                    BodyDef def = new BodyDef();
+                    def.type = BodyDef.BodyType.StaticBody;
+                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
+                    Body body = world.createBody(def);
+                    FixtureDef fixtureDef = new FixtureDef();
+                    PolygonShape shape = new PolygonShape();
+                    float ratio = config.entities.spikeSizeRatio;
+                    float invertedRatio = 1f - ratio;
+                    float centerX = scale
+                            * instance.halfWidth()
+                            * invertedRatio
+                            * (tileName.endsWith("left") ? -1f : tileName.endsWith("right") ? 1f : 0f);
+                    float centerY = scale
+                            * instance.halfHeight()
+                            * invertedRatio
+                            * (tileName.endsWith("bottom") ? -1f : tileName.endsWith("top") ? 1f : 0f);
+                    shape.setAsBox(
+                            instance.halfWidth() * scale * ratio,
+                            instance.halfHeight() * scale * ratio,
+                            new Vector2(centerX, centerY),
+                            0f);
+                    fixtureDef.shape = shape;
+                    fixtureDef.isSensor = true;
+                    fixtureDef.filter.categoryBits = Bits.Category.SPIKE.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.SPIKE.bits;
+                    body.createFixture(fixtureDef);
+                    return body;
+                }));
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public List<Entity> falseFloors() {
+        float scale = config.display.scale;
+        LdtkLayerInstance entityLayer = entityLayer();
+        List<Entity> entities = new ArrayList<>();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if ("False_floor".equals(instance.identifier)) {
+                Entity entity = new Entity();
+                String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
+                Image actor = new Image(atlas.findRegion("entities/" + tileName));
+                actor.setScale(scale);
+                float x = instance.x();
+                float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
+                actor.setPosition(x * scale, y * scale);
+                entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
+                entity.add(new BodyBuilderComponent(world -> {
+                    BodyDef def = new BodyDef();
+                    def.type = BodyDef.BodyType.StaticBody;
+                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
+                    Body body = world.createBody(def);
+                    FixtureDef fixtureDef = new FixtureDef();
+
+                    ChainShape shape = new ChainShape();
+
+                    float centerAdjustX = instance.halfWidth() * scale;
+                    float centerAdjustY = instance.halfHeight() * scale * 3f / 16f;
+
+                    float[] vertices = new float[] {
+                        -centerAdjustX,
+                        -centerAdjustY,
+                        -centerAdjustX,
+                        centerAdjustY,
+                        centerAdjustX,
+                        centerAdjustY,
+                        centerAdjustX,
+                        -centerAdjustY,
+                    };
+                    shape.createLoop(vertices);
+                    fixtureDef.shape = shape;
+                    fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
+                    Fixture fixture = body.createFixture(fixtureDef);
+                    fixture.setUserData(entity);
+                    return body;
+                }));
+                entity.add(new FalseFloorComponent.Request());
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 }

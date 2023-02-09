@@ -30,10 +30,12 @@ public class DragonBonesAnimationsParser {
 
     private final TextureAtlas atlas;
     private final String basePath;
+    private final Map<String, Animation.PlayMode> playModes;
 
-    public DragonBonesAnimationsParser(TextureAtlas atlas, String basePath) {
+    public DragonBonesAnimationsParser(TextureAtlas atlas, String basePath, Map<String, Animation.PlayMode> playModes) {
         this.atlas = atlas;
         this.basePath = basePath;
+        this.playModes = playModes;
     }
 
     public AnimationNode.Group parse(DragonBonesEntity entity) {
@@ -103,8 +105,8 @@ public class DragonBonesAnimationsParser {
                     durationMs = 1;
                 }
 
-                animations.put(
-                        animation.name, new KeyFrameAnimation<>(frames, durationMs / 1000f, Animation.PlayMode.LOOP));
+                Animation.PlayMode playMode = playModes.getOrDefault(animation.name, Animation.PlayMode.LOOP);
+                animations.put(animation.name, new KeyFrameAnimation<>(frames, durationMs / 1000f, playMode));
             }
         }
         return new AnimationNode.Image(slot.name, defaultImage, animations);

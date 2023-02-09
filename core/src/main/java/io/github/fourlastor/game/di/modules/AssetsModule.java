@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.JsonReader;
 import dagger.Module;
 import dagger.Provides;
+import io.github.fourlastor.harlequin.animation.Animation;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.loader.dragonbones.DragonBonesLoader;
 import io.github.fourlastor.harlequin.loader.dragonbones.model.DragonBonesEntity;
@@ -16,6 +17,7 @@ import io.github.fourlastor.ldtk.LdtkLoader;
 import io.github.fourlastor.ldtk.model.LdtkMapData;
 import io.github.fourlastor.text.Text;
 import io.github.fourlastor.text.TextLoader;
+import java.util.HashMap;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -49,7 +51,10 @@ public class AssetsModule {
         assetManager.setLoader(AnimationNode.Group.class, dragonBonesLoader);
         assetManager.load(PATH_TEXTURE_ATLAS, TextureAtlas.class);
         assetManager.load(PATH_LEVELS, LdtkMapData.class);
-        assetManager.load(CHARACTER_ANIMATION_PATH, AnimationNode.Group.class);
+        HashMap<String, Animation.PlayMode> playModes = new HashMap<>();
+        playModes.put("dead", Animation.PlayMode.NORMAL);
+        assetManager.load(
+                CHARACTER_ANIMATION_PATH, AnimationNode.Group.class, new DragonBonesLoader.Parameters(playModes));
         assetManager.load(PATH_DEFAULT_SHADER, Text.class);
         assetManager.load(PATH_WAVE_SHADER, Text.class);
         assetManager.finishLoading();

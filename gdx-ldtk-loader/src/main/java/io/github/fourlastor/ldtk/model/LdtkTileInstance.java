@@ -37,7 +37,7 @@ public class LdtkTileInstance {
     }
 
     public int y(int levelHeight, int gridSize) {
-        return levelHeight * gridSize - px.get(1);
+        return (levelHeight - 1) * gridSize - px.get(1);
     }
 
     /**
