@@ -147,13 +147,13 @@ public class EntitiesFactory {
             Body body = world.createBody(def);
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
-            shape.setAsBox(halfWidth, halfHeight);
+            shape.setAsBox(halfWidth, halfHeight, new Vector2(0f, -halfHeight), 0f);
             fixtureDef.shape = shape;
             fixtureDef.friction = 0f;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
             body.createFixture(fixtureDef);
-            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight), 0f);
+            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight * 2), 0f);
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER_FOOT.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER_FOOT.bits;
