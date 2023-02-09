@@ -44,9 +44,10 @@ public class Jumping extends HorizontalMovement {
     public void update(Entity entity) {
         super.update(entity);
         Body body = bodies.get(entity).body;
+        body.applyForceToCenter(config.player.antiGravity, false);
         float distanceTravelled = Math.abs(body.getPosition().y - initialY);
         if (config.player.minJumpHeight <= distanceTravelled && !inputs.get(entity).jumpPressed) {
-            setVerticalVelocity(body, 0f);
+            setVerticalVelocity(body, body.getLinearVelocity().y / 1.7f);
         }
         if (body.getLinearVelocity().y <= 0f) {
             PlayerComponent playerComponent = players.get(entity);
@@ -64,7 +65,7 @@ public class Jumping extends HorizontalMovement {
 
         // gravity is given per second, but we want time step values here
         float t = 1 / 60.0f;
-        float stepGravity = config.physics.gravity.y * t * t; // m/s/s
+        float stepGravity = (config.physics.gravity.y + config.player.antiGravity.y) * t * t; // m/s/s
 
         // quadratic equation setup (ax² + bx + c = 0)
         float a = 0.5f / stepGravity;
