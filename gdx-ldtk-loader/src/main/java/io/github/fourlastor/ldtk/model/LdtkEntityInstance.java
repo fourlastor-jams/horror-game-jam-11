@@ -5,8 +5,9 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 import io.github.fourlastor.json.JsonParser;
-import java.util.List;
+
 import javax.inject.Inject;
+import java.util.List;
 
 public class LdtkEntityInstance {
 
@@ -59,7 +60,15 @@ public class LdtkEntityInstance {
     }
 
     public int y(int levelHeight, int gridSize) {
-        return levelHeight * gridSize - px.get(1);
+        return (levelHeight - 1) * gridSize - px.get(1);
+    }
+
+    public float halfWidth() {
+        return width / 2f;
+    }
+
+    public float halfHeight() {
+        return height / 2f;
     }
 
     /**

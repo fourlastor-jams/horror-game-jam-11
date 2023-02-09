@@ -3,6 +3,7 @@ package io.github.fourlastor.ldtk.model;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonValue;
 import io.github.fourlastor.json.JsonParser;
+
 import javax.inject.Inject;
 
 public class LdtkTileInstance {
@@ -37,7 +38,7 @@ public class LdtkTileInstance {
     }
 
     public int y(int levelHeight, int gridSize) {
-        return levelHeight * gridSize - px.get(1);
+        return (levelHeight - 1) * gridSize - px.get(1);
     }
 
     /**
