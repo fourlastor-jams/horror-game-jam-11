@@ -7,11 +7,13 @@ public class GameConfig {
     public final Display display;
     public final Physics physics;
     public final Player player;
+    public final Entities entities;
 
-    public GameConfig(Display display, Physics physics, Player player) {
+    public GameConfig(Display display, Physics physics, Player player, Entities entities) {
         this.display = display;
         this.physics = physics;
         this.player = player;
+        this.entities = entities;
     }
 
     public static class Physics {
@@ -53,6 +55,14 @@ public class GameConfig {
             this.maxJumpHeight = maxJumpHeight;
             this.fallingGraceTime = fallingGraceTime;
             this.antiGravity = antiGravity;
+        }
+    }
+
+    public static class Entities {
+        public final float spikeSizeRatio;
+
+        public Entities(float spikeSizeRatio) {
+            this.spikeSizeRatio = spikeSizeRatio;
         }
     }
 }

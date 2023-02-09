@@ -29,9 +29,11 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
+
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
+import java.util.Locale;
 
 /**
  * Factory to create various entities: player, buildings, enemies..
@@ -137,8 +139,8 @@ public class EntitiesFactory {
         entity.add(new BodyBuilderComponent(world -> {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.DynamicBody;
-            float halfWidth = playerSpawn.width / 2f * halfScale;
-            float halfHeight = playerSpawn.height / 2f * halfScale;
+            float halfWidth = playerSpawn.halfWidth() * halfScale;
+            float halfHeight = playerSpawn.halfHeight() * halfScale;
             def.position.set(
                     halfWidth + playerSpawn.x() * scale,
                     halfHeight + playerSpawn.y(entityLayer.cHei, entityLayer.gridSize) * scale);
@@ -175,12 +177,58 @@ public class EntitiesFactory {
     }
 
     private LdtkLayerInstance entityLayer() {
-
         for (LdtkLayerInstance layerInstance : definition.layerInstances) {
             if ("Entities".equals(layerInstance.type)) {
                 return layerInstance;
             }
         }
         throw new IllegalStateException("Missing entities layer");
+    }
+
+    public List<Entity> spikes() {
+        float scale = config.display.scale;
+        LdtkLayerInstance entityLayer = entityLayer();
+        List<Entity> entities = new ArrayList<>();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if (instance.identifier.startsWith("Spike")) {
+                Entity entity = new Entity();
+                String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
+                Image actor = new Image(atlas.findRegion("entities/" + tileName));
+                actor.setScale(scale);
+                float x = instance.x();
+                float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
+                actor.setPosition(x * scale, y * scale);
+                entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
+                entity.add(new BodyBuilderComponent(world -> {
+                    BodyDef def = new BodyDef();
+                    def.type = BodyDef.BodyType.StaticBody;
+                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
+                    Body body = world.createBody(def);
+                    FixtureDef fixtureDef = new FixtureDef();
+                    PolygonShape shape = new PolygonShape();
+                    float ratio = config.entities.spikeSizeRatio;
+                    float invertedRatio = 1f - ratio;
+                    float centerX = scale
+                            * instance.halfWidth()
+                            * invertedRatio
+                            * (tileName.endsWith("left") ? -1f : tileName.endsWith("right") ? 1f : 0f);
+                    float centerY = scale
+                            * instance.halfHeight()
+                            * invertedRatio
+                            * (tileName.endsWith("bottom") ? -1f : tileName.endsWith("top") ? 1f : 0f);
+                    shape.setAsBox(
+                            instance.halfWidth() * scale * ratio,
+                            instance.halfHeight() * scale * ratio,
+                            new Vector2(centerX, centerY),
+                            0f);
+                    fixtureDef.shape = shape;
+                    fixtureDef.isSensor = true;
+                    body.createFixture(fixtureDef);
+                    return body;
+                }));
+                entities.add(entity);
+            }
+        }
+        return entities;
     }
 }
