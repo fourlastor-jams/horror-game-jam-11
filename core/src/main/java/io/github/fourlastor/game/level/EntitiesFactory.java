@@ -60,6 +60,13 @@ public class EntitiesFactory {
         this.config = config;
     }
 
+    @SuppressWarnings("unused") // dev only
+    public Entity origin() {
+        Entity entity = new Entity();
+        entity.add(new ActorComponent(new Image(atlas.findRegion("whitePixel")), ActorComponent.Layer.CHARACTER));
+        return entity;
+    }
+
     public List<Entity> tiles() {
         float scale = config.display.scale;
         LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", scale);
