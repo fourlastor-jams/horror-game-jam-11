@@ -224,6 +224,8 @@ public class EntitiesFactory {
                             0f);
                     fixtureDef.shape = shape;
                     fixtureDef.isSensor = true;
+                    fixtureDef.filter.categoryBits = Bits.Category.SPIKE.bits;
+                    fixtureDef.filter.maskBits = Bits.Mask.SPIKE.bits;
                     body.createFixture(fixtureDef);
                     return body;
                 }));

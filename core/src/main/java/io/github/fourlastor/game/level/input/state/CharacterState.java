@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
@@ -49,6 +50,11 @@ public abstract class CharacterState implements State<Entity> {
 
     @Override
     public boolean onMessage(Entity entity, Telegram telegram) {
+        if (telegram.message == Message.PLAYER_ON_SPIKE.ordinal()) {
+            PlayerComponent playerComponent = players.get(entity);
+            playerComponent.stateMachine.changeState(playerComponent.dead);
+            return true;
+        }
         return false;
     }
 }
