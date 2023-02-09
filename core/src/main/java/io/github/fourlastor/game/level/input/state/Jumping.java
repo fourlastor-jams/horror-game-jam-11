@@ -8,6 +8,7 @@ import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+
 import javax.inject.Inject;
 
 public class Jumping extends HorizontalMovement {
@@ -46,7 +47,7 @@ public class Jumping extends HorizontalMovement {
         Body body = bodies.get(entity).body;
         float distanceTravelled = Math.abs(body.getPosition().y - initialY);
         if (config.player.minJumpHeight <= distanceTravelled && !inputs.get(entity).jumpPressed) {
-            setVerticalVelocity(body, 0f);
+            setVerticalVelocity(body, body.getLinearVelocity().y / 1.7f);
         }
         if (body.getLinearVelocity().y <= 0f) {
             PlayerComponent playerComponent = players.get(entity);
