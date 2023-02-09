@@ -12,6 +12,7 @@ import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
+import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 
 @Module
 public class EcsModule {
@@ -62,5 +63,11 @@ public class EcsModule {
     @ScreenScoped
     public ComponentMapper<SoundComponent> soundComponent() {
         return ComponentMapper.getFor(SoundComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<FalseFloorComponent> falseFloorComponent() {
+        return ComponentMapper.getFor(FalseFloorComponent.class);
     }
 }

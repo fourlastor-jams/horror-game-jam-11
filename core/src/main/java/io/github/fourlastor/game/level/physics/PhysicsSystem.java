@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
+
 import javax.inject.Inject;
 
 public class PhysicsSystem extends IntervalSystem {
@@ -111,8 +112,10 @@ public class PhysicsSystem extends IntervalSystem {
         public void beginContact(Contact contact) {
             Fixture fixtureA = contact.getFixtureA();
             Fixture fixtureB = contact.getFixtureB();
-            if (isPlayerFoot(fixtureA) && isGround(fixtureB) || isGround(fixtureA) && isPlayerFoot(fixtureB)) {
-                propagateOnGround();
+            if (isPlayerFoot(fixtureA) && isGround(fixtureB)) {
+                propagateOnGround(fixtureB.getUserData());
+            } else if (isGround(fixtureA) && isPlayerFoot(fixtureB)) {
+                propagateOnGround(fixtureA.getUserData());
             }
         }
 
@@ -134,7 +137,7 @@ public class PhysicsSystem extends IntervalSystem {
         public void postSolve(Contact contact, ContactImpulse impulse) {}
     };
 
-    private void propagateOnGround() {
-        messageDispatcher.dispatchMessage(Message.PLAYER_ON_GROUND.ordinal());
+    private void propagateOnGround(Object floorEntity) {
+        messageDispatcher.dispatchMessage(Message.PLAYER_ON_GROUND.ordinal(), floorEntity);
     }
 }

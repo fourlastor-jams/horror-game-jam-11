@@ -12,6 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.GameConfig;
+import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorSystem;
 import io.github.fourlastor.game.level.input.CharacterStateSystem;
 import io.github.fourlastor.game.level.input.InputBufferSystem;
 import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
@@ -31,6 +32,7 @@ public class LevelModule {
     public Engine engine(
             InputBufferSystem inputBufferSystem,
             CharacterStateSystem characterStateSystem,
+            FalseFloorSystem falseFloorSystem,
             CameraMovementSystem cameraMovementSystem,
             PhysicsSystem physicsSystem,
             ActorFollowBodySystem actorFollowBodySystem,
@@ -44,6 +46,7 @@ public class LevelModule {
         engine.addSystem(movingSystem);
         engine.addSystem(inputBufferSystem);
         engine.addSystem(characterStateSystem);
+        engine.addSystem(falseFloorSystem);
         engine.addSystem(physicsSystem);
         engine.addSystem(soundSystem);
         engine.addSystem(cameraMovementSystem);

@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,6 +19,7 @@ import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
+import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.physics.Bits;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
@@ -29,10 +31,11 @@ import io.github.fourlastor.ldtk.model.LdtkLevelDefinition;
 import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
+
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Inject;
 
 /**
  * Factory to create various entities: player, buildings, enemies..
@@ -271,9 +274,11 @@ public class EntitiesFactory {
                     fixtureDef.shape = shape;
                     fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
                     fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
-                    body.createFixture(fixtureDef);
+                    Fixture fixture = body.createFixture(fixtureDef);
+                    fixture.setUserData(entity);
                     return body;
                 }));
+                entity.add(new FalseFloorComponent.Request());
                 entities.add(entity);
             }
         }
