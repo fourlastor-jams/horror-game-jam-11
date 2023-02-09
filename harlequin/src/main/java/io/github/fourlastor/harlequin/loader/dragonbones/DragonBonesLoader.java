@@ -13,7 +13,6 @@ import io.github.fourlastor.harlequin.animation.Animation;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
 import io.github.fourlastor.harlequin.loader.dragonbones.model.DragonBonesEntity;
 import io.github.fourlastor.json.JsonParser;
-
 import java.util.Collections;
 import java.util.Map;
 
