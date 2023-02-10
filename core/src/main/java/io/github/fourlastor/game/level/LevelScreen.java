@@ -2,9 +2,13 @@ package io.github.fourlastor.game.level;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import io.github.fourlastor.game.route.Router;
 import javax.inject.Inject;
 
 public class LevelScreen extends ScreenAdapter {
@@ -15,12 +19,23 @@ public class LevelScreen extends ScreenAdapter {
     private final World world;
     private final EntitiesFactory factory;
 
+    private final InputMultiplexer input;
+    private final Router router;
+
     @Inject
-    public LevelScreen(Engine engine, Viewport viewport, World world, EntitiesFactory factory) {
+    public LevelScreen(
+            Engine engine,
+            Viewport viewport,
+            World world,
+            EntitiesFactory factory,
+            InputMultiplexer input,
+            Router router) {
         this.engine = engine;
         this.viewport = viewport;
         this.world = world;
         this.factory = factory;
+        this.input = input;
+        this.router = router;
     }
 
     @Override
@@ -36,7 +51,25 @@ public class LevelScreen extends ScreenAdapter {
             engine.addEntity(tile);
         }
         engine.addEntity(factory.character());
+        input.addProcessor(restartOnR);
     }
+
+    @Override
+    public void hide() {
+        input.removeProcessor(restartOnR);
+        super.hide();
+    }
+
+    private final InputAdapter restartOnR = new InputAdapter() {
+        @Override
+        public boolean keyDown(int keycode) {
+            if (keycode == Input.Keys.R) {
+                router.goToLevel(0);
+                return true;
+            }
+            return super.keyDown(keycode);
+        }
+    };
 
     @Override
     public void resize(int width, int height) {
