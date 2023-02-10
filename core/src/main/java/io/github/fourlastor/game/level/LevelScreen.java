@@ -31,7 +31,8 @@ public class LevelScreen extends ScreenAdapter {
             World world,
             EntitiesFactory factory,
             InputMultiplexer input,
-            Router router, Stage stage) {
+            Router router,
+            Stage stage) {
         this.engine = engine;
         this.viewport = viewport;
         this.world = world;
