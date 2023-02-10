@@ -90,7 +90,7 @@ public class LevelModule {
     @Provides
     public GameConfig gameConfig() {
         return new GameConfig(
-                new GameConfig.Display(16f, 9f, 1f / 16f),
+                new GameConfig.Display(32f, 18f, 1f / 16f),
                 new GameConfig.Physics(new Vector2(0f, -10f)),
                 new GameConfig.Player(6f, 0.15f, 1f, 2.5f, 0.1f, new Vector2(0f, -20f)),
                 new GameConfig.Entities(0.7f));
