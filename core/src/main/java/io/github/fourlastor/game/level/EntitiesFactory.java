@@ -154,7 +154,7 @@ public class EntitiesFactory {
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER.bits;
             body.createFixture(fixtureDef);
-            shape.setAsBox(0.1f, 0.03f, new Vector2(0f, -halfHeight * 2), 0f);
+            shape.setAsBox(halfWidth * 0.9f, 0.03f, new Vector2(0f, -halfHeight * 2), 0f);
             fixtureDef.isSensor = true;
             fixtureDef.filter.categoryBits = Bits.Category.PLAYER_FOOT.bits;
             fixtureDef.filter.maskBits = Bits.Mask.PLAYER_FOOT.bits;
