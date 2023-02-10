@@ -8,6 +8,7 @@ import io.github.fourlastor.game.di.GameComponent;
 import io.github.fourlastor.game.intro.IntroComponent;
 import io.github.fourlastor.game.level.di.LevelComponent;
 import io.github.fourlastor.game.level.di.MapModule;
+import io.github.fourlastor.game.level.di.UnPhysicsComponent;
 import io.github.fourlastor.game.route.Router;
 import io.github.fourlastor.game.route.RouterModule;
 
@@ -17,16 +18,19 @@ public class GdxGame extends Game implements Router {
 
     private final LevelComponent.Builder levelScreenFactory;
     private final IntroComponent.Builder introScreenFactory;
+    private final UnPhysicsComponent.Builder unPhysicsScreenFactory;
 
     private Screen pendingScreen = null;
 
     public GdxGame(
             InputMultiplexer multiplexer,
             LevelComponent.Builder levelScreenFactory,
-            IntroComponent.Builder introScreenFactory) {
+            IntroComponent.Builder introScreenFactory,
+            UnPhysicsComponent.Builder unPhysicsScreenFactory) {
         this.multiplexer = multiplexer;
         this.levelScreenFactory = levelScreenFactory;
         this.introScreenFactory = introScreenFactory;
+        this.unPhysicsScreenFactory = unPhysicsScreenFactory;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class GdxGame extends Game implements Router {
 
     @Override
     public void goToLevel(int levelIndex) {
-        pendingScreen = levelScreenFactory
+        pendingScreen = unPhysicsScreenFactory
                 .router(new RouterModule(this))
                 .map(new MapModule(levelIndex))
                 .build()
