@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.fourlastor.game.route.Router;
 import javax.inject.Inject;
@@ -21,6 +22,7 @@ public class LevelScreen extends ScreenAdapter {
 
     private final InputMultiplexer input;
     private final Router router;
+    private final Stage stage;
 
     @Inject
     public LevelScreen(
@@ -29,13 +31,14 @@ public class LevelScreen extends ScreenAdapter {
             World world,
             EntitiesFactory factory,
             InputMultiplexer input,
-            Router router) {
+            Router router, Stage stage) {
         this.engine = engine;
         this.viewport = viewport;
         this.world = world;
         this.factory = factory;
         this.input = input;
         this.router = router;
+        this.stage = stage;
     }
 
     @Override
@@ -86,6 +89,7 @@ public class LevelScreen extends ScreenAdapter {
         engine.removeAllEntities();
         engine.removeAllSystems();
         world.dispose();
+        stage.dispose();
         super.dispose();
     }
 }
