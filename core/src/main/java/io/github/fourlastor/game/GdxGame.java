@@ -38,7 +38,11 @@ public class GdxGame extends Game implements Router {
     @Override
     public void render() {
         if (pendingScreen != null) {
+            Screen previous = screen;
             setScreen(pendingScreen);
+            if (previous != null) {
+                previous.dispose();
+            }
             pendingScreen = null;
         }
         super.render();
