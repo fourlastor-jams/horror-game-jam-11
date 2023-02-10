@@ -227,6 +227,7 @@ public class EntitiesFactory {
                     fixtureDef.filter.categoryBits = Bits.Category.SPIKE.bits;
                     fixtureDef.filter.maskBits = Bits.Mask.SPIKE.bits;
                     body.createFixture(fixtureDef);
+                    shape.dispose();
                     return body;
                 }));
                 entities.add(entity);
@@ -277,6 +278,7 @@ public class EntitiesFactory {
                     fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
                     Fixture fixture = body.createFixture(fixtureDef);
                     fixture.setUserData(entity);
+                    shape.dispose();
                     return body;
                 }));
                 entity.add(new FalseFloorComponent.Request());
