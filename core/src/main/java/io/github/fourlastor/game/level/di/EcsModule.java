@@ -13,6 +13,11 @@ import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
+import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 
 @Module
 public class EcsModule {
@@ -69,5 +74,35 @@ public class EcsModule {
     @ScreenScoped
     public ComponentMapper<FalseFloorComponent> falseFloorComponent() {
         return ComponentMapper.getFor(FalseFloorComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<GravityComponent> gravityComponent() {
+        return ComponentMapper.getFor(GravityComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<KinematicBodyComponent> kinematicBodyComponent() {
+        return ComponentMapper.getFor(KinematicBodyComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<MovingBodyComponent> movingBodyComponent() {
+        return ComponentMapper.getFor(MovingBodyComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<SolidBodyComponent> solidBodyComponent() {
+        return ComponentMapper.getFor(SolidBodyComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<TransformComponent> transformComponent() {
+        return ComponentMapper.getFor(TransformComponent.class);
     }
 }

@@ -14,6 +14,9 @@ import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.system.ClearScreenSystem;
 import io.github.fourlastor.game.level.system.StageSystem;
+import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
+import io.github.fourlastor.game.level.unphysics.system.BodyMovingSystem;
+import io.github.fourlastor.game.level.unphysics.system.GravitySystem;
 
 @Module
 public class UnPhysicsModule {
@@ -21,9 +24,15 @@ public class UnPhysicsModule {
     @Provides
     @ScreenScoped
     public Engine engine(
-            StageSystem stageSystem,
-            ClearScreenSystem clearScreenSystem) {
+            GravitySystem gravitySystem,
+            BodyMovingSystem bodyMovingSystem,
+            ActorFollowTransformSystem actorFollowTransformSystem,
+            ClearScreenSystem clearScreenSystem,
+            StageSystem stageSystem) {
         Engine engine = new Engine();
+        engine.addSystem(gravitySystem);
+        engine.addSystem(bodyMovingSystem);
+        engine.addSystem(actorFollowTransformSystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
         return engine;
@@ -62,7 +71,7 @@ public class UnPhysicsModule {
     @Provides
     public GameConfig gameConfig() {
         return new GameConfig(
-                new GameConfig.Display(16f, 9f, 1f / 16f),
+                new GameConfig.Display(256f, 144f, 1f / 16f),
                 new GameConfig.Physics(new Vector2(0f, -10f)),
                 new GameConfig.Player(8f, 0.1f, 1f, 4f, 0.2f, new Vector2(0f, -20f)),
                 new GameConfig.Entities(0.7f));

@@ -7,7 +7,6 @@ import io.github.fourlastor.game.GdxGame;
 import io.github.fourlastor.game.intro.IntroComponent;
 import io.github.fourlastor.game.level.di.LevelComponent;
 import io.github.fourlastor.game.level.di.UnPhysicsComponent;
-
 import java.util.Random;
 import javax.inject.Singleton;
 
