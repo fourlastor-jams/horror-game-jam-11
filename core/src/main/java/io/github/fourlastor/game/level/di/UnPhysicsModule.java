@@ -17,6 +17,7 @@ import io.github.fourlastor.game.level.system.StageSystem;
 import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
 import io.github.fourlastor.game.level.unphysics.system.BodyMovingSystem;
 import io.github.fourlastor.game.level.unphysics.system.GravitySystem;
+import io.github.fourlastor.game.level.unphysics.system.TransformDebugSystem;
 
 @Module
 public class UnPhysicsModule {
@@ -28,6 +29,7 @@ public class UnPhysicsModule {
             BodyMovingSystem bodyMovingSystem,
             ActorFollowTransformSystem actorFollowTransformSystem,
             ClearScreenSystem clearScreenSystem,
+            TransformDebugSystem transformDebugSystem,
             StageSystem stageSystem) {
         Engine engine = new Engine();
         engine.addSystem(gravitySystem);
@@ -35,6 +37,7 @@ public class UnPhysicsModule {
         engine.addSystem(actorFollowTransformSystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
+        engine.addSystem(transformDebugSystem);
         return engine;
     }
 
