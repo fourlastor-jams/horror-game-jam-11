@@ -25,11 +25,11 @@ public class Transform {
         return area.x + area.width;
     }
 
-    public float top() {
+    public float bottom() {
         return area.y;
     }
 
-    public float bottom() {
+    public float top() {
         return area.y + area.height;
     }
 
