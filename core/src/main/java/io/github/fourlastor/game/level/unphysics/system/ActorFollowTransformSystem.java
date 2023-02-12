@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
@@ -31,10 +32,15 @@ public class ActorFollowTransformSystem extends IteratingSystem {
         this.actors = actors;
     }
 
+    private final Vector2 center = new Vector2();
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Actor actor = actors.get(entity).actor;
         Transform transform = transforms.get(entity).transform;
-        actor.setPosition(transform.left(), transform.top());
+        transform.area().getCenter(center);
+        actor.setPosition(
+                center.x - (actor.getScaleX() * actor.getWidth() / 2),
+                center.y - (actor.getScaleY() * actor.getHeight() / 2));
     }
 }
