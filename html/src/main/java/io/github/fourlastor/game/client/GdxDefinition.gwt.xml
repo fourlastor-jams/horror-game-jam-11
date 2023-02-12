@@ -8,6 +8,7 @@
 	<inherits name="com.badlogic.gdx.ai" />
 	<inherits name="regexodus" />
 	<inherits name="textratypist" />
+	<inherits name="space.earlygrey.shapedrawer"/>
 	<inherits name="com.badlogic.ashley_gwt" />
 
 	<inherits name="io.github.fourlastor.GdxGame" />
