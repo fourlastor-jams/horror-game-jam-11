@@ -184,9 +184,11 @@ public class BodyMovingSystem extends IntervalSystem {
                 if (collides(offsetBy(transform.area(), sign, 0))) {
                     // Collision with Solid
                     kinematicBody.collision.x = sign;
+                    kinematicBody.touching.x = sign;
                     break;
                 } else {
                     // There is no Solid immediately beside us
+                    kinematicBody.touching.x = 0;
                     transform.moveXBy(sign);
                     move -= sign;
                 }
@@ -205,9 +207,11 @@ public class BodyMovingSystem extends IntervalSystem {
                 if (collides(offsetBy(transform.area(), 0, sign))) {
                     // Collision with Solid
                     kinematicBody.collision.y = sign;
+                    kinematicBody.touching.y = sign;
                     break;
                 } else {
                     // There is no Solid immediately beside us
+                    kinematicBody.touching.y = 0;
                     transform.moveYBy(sign);
                     move -= sign;
                 }
