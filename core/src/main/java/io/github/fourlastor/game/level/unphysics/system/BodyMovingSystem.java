@@ -3,10 +3,13 @@ package io.github.fourlastor.game.level.unphysics.system;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
@@ -19,21 +22,22 @@ import javax.inject.Inject;
  */
 public class BodyMovingSystem extends IntervalSystem {
 
-    private static final Family FAMILY_SOLID =
-            Family.all(SolidBodyComponent.class).get();
+    private static final Family FAMILY_SOLID_IMMOBILE =
+            Family.all(SolidBodyComponent.class).exclude(MovingBodyComponent.class).get();
     private static final Family FAMILY_SOLID_MOVING =
             Family.all(MovingBodyComponent.class, SolidBodyComponent.class).get();
     private static final Family FAMILY_KINEMATIC =
             Family.all(MovingBodyComponent.class, KinematicBodyComponent.class).get();
     private static final float INTERVAL = 1f / 60f;
+    private static final float CHUNK_SIZE = 16 * 5f;
 
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
-    private ImmutableArray<Entity> solidEntities;
     private ImmutableArray<Entity> solidMovingEntities;
     private ImmutableArray<Entity> kinematicEntities;
+    private IntMap<Array<Entity>> immobileSolids;
 
     @Inject
     public BodyMovingSystem(
@@ -51,14 +55,16 @@ public class BodyMovingSystem extends IntervalSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        solidEntities = engine.getEntitiesFor(FAMILY_SOLID);
+        engine.addEntityListener(FAMILY_SOLID_IMMOBILE, solidChunkListener);
+        immobileSolids = new IntMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
         kinematicEntities = engine.getEntitiesFor(FAMILY_KINEMATIC);
     }
 
     @Override
     public void removedFromEngine(Engine engine) {
-        solidEntities = null;
+        engine.removeEntityListener(solidChunkListener);
+        immobileSolids = null;
         solidMovingEntities = null;
         kinematicEntities = null;
         super.removedFromEngine(engine);
@@ -75,7 +81,6 @@ public class BodyMovingSystem extends IntervalSystem {
     }
 
     private void moveSolid(Entity entity, float delta) {
-
         MovingBodyComponent movingBody = movingBodies.get(entity);
         SolidBodyComponent solidBody = solidBodies.get(entity);
         Transform transform = transforms.get(entity).transform;
@@ -241,7 +246,23 @@ public class BodyMovingSystem extends IntervalSystem {
     }
 
     private boolean collides(Rectangle area) {
-        for (Entity entity : solidEntities) {
+        int startX = (int) (area.x / CHUNK_SIZE);
+        int endX = (int) ((area.x + area.width) / CHUNK_SIZE);
+        int startY = (int) (area.y / CHUNK_SIZE);
+        int endY = (int) ((area.y + area.height) / CHUNK_SIZE);
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                int fused = fusedCoordinates(x, y);
+                Array<Entity> entities = immobileSolids.get(fused);
+                if (entities == null) continue;
+                for (Entity entity : entities) {
+                    if (collides(area, solidBodies.get(entity), transforms.get(entity).transform)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        for (Entity entity : solidMovingEntities) {
             if (collides(area, solidBodies.get(entity), transforms.get(entity).transform)) {
                 return true;
             }
@@ -258,5 +279,48 @@ public class BodyMovingSystem extends IntervalSystem {
         Rectangle solidArea = solidTransform.area();
         return kinematicArea.overlaps(solidArea)
                 || offsetBy(kinematicArea, 0, 3).overlaps(solidArea);
+    }
+
+
+    private final EntityListener solidChunkListener = new EntityListener() {
+        @Override
+        public void entityAdded(Entity entity) {
+            Transform area = transforms.get(entity).transform;
+            int startX = (int) (area.left() / CHUNK_SIZE);
+            int endX = (int) (area.right() / CHUNK_SIZE);
+            int startY = (int) (area.bottom() / CHUNK_SIZE);
+            int endY = (int) (area.top() / CHUNK_SIZE);
+            for (int x = startX; x <= endX; x++) {
+                for (int y = startY; y <= endY; y++) {
+                    int fused = fusedCoordinates(x, y);
+                    if (!immobileSolids.containsKey(fused)) {
+                        immobileSolids.put(fused, new Array<>());
+                    }
+                    immobileSolids.get(fused).add(entity);
+                }
+            }
+        }
+
+        @Override
+        public void entityRemoved(Entity entity) {
+            Transform area = transforms.get(entity).transform;
+            int startX = (int) (area.left() / CHUNK_SIZE);
+            int endX = (int) (area.right() / CHUNK_SIZE);
+            int startY = (int) (area.bottom() / CHUNK_SIZE);
+            int endY = (int) (area.top() / CHUNK_SIZE);
+            for (int x = startX; x <= endX; x++) {
+                for (int y = startY; y <= endY; y++) {
+                    int fused = fusedCoordinates(x, y);
+                    if (!immobileSolids.containsKey(fused)) {
+                        continue;
+                    }
+                    immobileSolids.get(fused).removeValue(entity, true);
+                }
+            }
+        }
+    };
+
+    private int fusedCoordinates(int x, int y) {
+        return x << 16 | (y & 0xFFFF);
     }
 }
