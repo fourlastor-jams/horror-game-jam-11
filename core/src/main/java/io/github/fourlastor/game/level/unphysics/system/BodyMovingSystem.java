@@ -105,27 +105,24 @@ public class BodyMovingSystem extends IntervalSystem {
     public void checkSolidCollisionsX(SolidBodyComponent solidBody, Transform solidTransform, float moveX) {
         for (Entity entity : kinematicEntities) {
             KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
-            MovingBodyComponent movingBody = movingBodies.get(entity);
             Transform kinematicTransform = transforms.get(entity).transform;
             if (moveX > 0) {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicX(
                             solidTransform.right() - kinematicTransform.left(),
-                            movingBody,
                             kinematicBody,
                             kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
-                    moveKinematicX(moveX, movingBody, kinematicBody, kinematicTransform);
+                    moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
             } else {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicX(
                             solidTransform.left() - kinematicTransform.right(),
-                            movingBody,
                             kinematicBody,
                             kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
-                    moveKinematicX(moveX, movingBody, kinematicBody, kinematicTransform);
+                    moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
             }
         }
@@ -140,21 +137,19 @@ public class BodyMovingSystem extends IntervalSystem {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicY(
                             solidTransform.top() - kinematicTransform.bottom(),
-                            movingBody,
                             kinematicBody,
-                            kinematicTransform);
+                            movingBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
-                    moveKinematicY(moveY, movingBody, kinematicBody, kinematicTransform);
+                    moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             } else {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicY(
                             solidTransform.bottom() - kinematicTransform.top(),
-                            movingBody,
                             kinematicBody,
-                            kinematicTransform);
+                            movingBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
-                    moveKinematicY(moveY, movingBody, kinematicBody, kinematicTransform);
+                    moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             }
         }
@@ -165,8 +160,8 @@ public class BodyMovingSystem extends IntervalSystem {
         KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
         Transform kinematicTransform = transforms.get(entity).transform;
         resetCollisions(kinematicBody);
-        moveKinematicX(delta * movingBody.speed.x, movingBody, kinematicBody, kinematicTransform);
-        moveKinematicY(delta * movingBody.speed.y, movingBody, kinematicBody, kinematicTransform);
+        moveKinematicX(delta * movingBody.speed.x, kinematicBody, kinematicTransform);
+        moveKinematicY(delta * movingBody.speed.y, kinematicBody, movingBody, kinematicTransform);
     }
 
     private void resetCollisions(KinematicBodyComponent kinematicBody) {
@@ -174,54 +169,73 @@ public class BodyMovingSystem extends IntervalSystem {
     }
 
     public void moveKinematicX(
-            float amount, MovingBodyComponent movingBody, KinematicBodyComponent kinematicBody, Transform transform) {
-        movingBody.xRemainder += amount;
-        int move = (int) movingBody.xRemainder;
+            float amount, KinematicBodyComponent kinematicBody, Transform transform) {
+        int move = (int) amount;
+        int sign = Integer.signum(move);
         if (move != 0) {
-            movingBody.xRemainder -= move;
-            int sign = Integer.signum(move);
-            while (move != 0) {
-                if (collides(offsetBy(transform.area(), sign, 0))) {
-                    // Collision with Solid
-                    kinematicBody.collision.x = sign;
-                    kinematicBody.touching.x = sign;
+            amount -= move;
+            for (int i = 0; i < Math.abs(move); i++) {
+                if (attemptMoveX(kinematicBody, transform, sign)) {
                     break;
-                } else {
-                    // There is no Solid immediately beside us
-                    kinematicBody.touching.x = 0;
-                    transform.moveXBy(sign);
-                    move -= sign;
                 }
             }
+        }
+        if (kinematicBody.touching.x == 0) {
+            attemptMoveX(kinematicBody, transform, amount);
         }
     }
 
     public void moveKinematicY(
-            float amount, MovingBodyComponent movingBody, KinematicBodyComponent kinematicBody, Transform transform) {
-        movingBody.yRemainder += amount;
-        int move = (int) movingBody.yRemainder;
+            float amount, KinematicBodyComponent kinematicBody, MovingBodyComponent movingBody, Transform transform) {
+        int move = (int) amount;
+        int sign = Integer.signum(move);
         if (move != 0) {
-            movingBody.yRemainder -= move;
-            int sign = Integer.signum(move);
-            while (move != 0) {
-                if (collides(offsetBy(transform.area(), 0, sign))) {
-                    // Collision with Solid
-                    kinematicBody.collision.y = sign;
-                    kinematicBody.touching.y = sign;
+            amount -= move;
+            for (int i = 0; i < Math.abs(move); i++) {
+                if (attemptMoveY(kinematicBody, movingBody, transform, sign)) {
                     break;
-                } else {
-                    // There is no Solid immediately beside us
-                    kinematicBody.touching.y = 0;
-                    transform.moveYBy(sign);
-                    move -= sign;
                 }
             }
+        }
+        if (kinematicBody.collision.y == 0) {
+            attemptMoveY(kinematicBody, movingBody, transform, amount);
+        }
+    }
+
+    private boolean attemptMoveX(KinematicBodyComponent kinematicBody, Transform transform, float amount) {
+        float direction = Math.signum(amount);
+        if (collides(offsetBy(transform.area(), direction, 0))) {
+            // Collision with Solid
+            kinematicBody.collision.x = (int) direction;
+            kinematicBody.touching.x = (int) direction;
+            return true;
+        } else {
+            // There is no Solid immediately beside us
+            kinematicBody.touching.x = 0;
+            transform.moveXBy(amount);
+            return false;
+        }
+    }
+
+    private boolean attemptMoveY(KinematicBodyComponent kinematicBody, MovingBodyComponent movingBody, Transform transform, float amount) {
+        float direction = Math.signum(amount);
+        if (collides(offsetBy(transform.area(), 0, direction))) {
+            // Collision with Solid
+            kinematicBody.collision.y = (int) direction;
+            kinematicBody.touching.y = (int) direction;
+            movingBody.speed.y = 0f;
+            return true;
+        } else {
+            // There is no Solid immediately beside us
+            kinematicBody.touching.y = 0;
+            transform.moveYBy(amount);
+            return false;
         }
     }
 
     private final Rectangle tmp = new Rectangle();
 
-    private Rectangle offsetBy(Rectangle area, int x, int y) {
+    private Rectangle offsetBy(Rectangle area, float x, float y) {
         Rectangle tmp = this.tmp.set(area);
         return tmp.setPosition(tmp.x + x, tmp.y + y);
     }

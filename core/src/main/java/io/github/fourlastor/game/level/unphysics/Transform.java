@@ -9,11 +9,11 @@ public class Transform {
         this.area = area;
     }
 
-    public final void moveXBy(int amount) {
+    public final void moveXBy(float amount) {
         area.x += amount;
     }
 
-    public final void moveYBy(int amount) {
+    public final void moveYBy(float amount) {
         area.y += amount;
     }
 
