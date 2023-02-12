@@ -51,15 +51,16 @@ public class GravitySystem extends IntervalSystem {
     @Override
     protected void updateInterval() {
         for (Entity entity : entities) {
-            GridPoint2 collision = kinematicBodies.get(entity).collision;
+            GridPoint2 touching = kinematicBodies.get(entity).touching;
             MovingBodyComponent movingBody = movingBodies.get(entity);
             Vector2 gravity = gravities.get(entity).gravity;
             int gravityDirection = (int) Math.signum(gravity.y);
-            boolean grounded = collision.y != 0 && collision.y == gravityDirection;
+            int movingDirection = (int) Math.signum(movingBody.speed.y);
+            boolean grounded = touching.y != 0 && touching.y == gravityDirection && gravityDirection == movingDirection;
             if (grounded) {
                 movingBody.speed.y = 0f;
             }
-            movingBody.speed.add(gravity.x * INTERVAL, gravity.y * INTERVAL);
+            movingBody.speed.add(gravity.x * INTERVAL * 0.999f, gravity.y * INTERVAL);
         }
     }
 }
