@@ -49,7 +49,7 @@ public class GravitySystem extends IntervalSystem {
         for (Entity entity : entities) {
             MovingBodyComponent movingBody = movingBodies.get(entity);
             Vector2 gravity = gravities.get(entity).gravity;
-            movingBody.speed.add(gravity.x * INTERVAL * 0.999f, gravity.y * INTERVAL);
+            movingBody.speed.add(gravity.x * INTERVAL, gravity.y * INTERVAL);
         }
     }
 }

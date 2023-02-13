@@ -8,9 +8,11 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import io.github.fourlastor.game.level.unphysics.Transform;
+import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
@@ -35,6 +37,7 @@ public class BodyMovingSystem extends IntervalSystem {
     private final ComponentMapper<MovingBodyComponent> movingBodies;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
+    private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> solidMovingEntities;
     private ImmutableArray<Entity> kinematicEntities;
     private IntMap<Array<Entity>> immobileSolids;
@@ -44,12 +47,13 @@ public class BodyMovingSystem extends IntervalSystem {
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<MovingBodyComponent> movingBodies,
             ComponentMapper<SolidBodyComponent> solidBodies,
-            ComponentMapper<KinematicBodyComponent> kinematicBodies) {
+            ComponentMapper<KinematicBodyComponent> kinematicBodies, ComponentMapper<GravityComponent> gravities) {
         super(INTERVAL);
         this.transforms = transforms;
         this.movingBodies = movingBodies;
         this.solidBodies = solidBodies;
         this.kinematicBodies = kinematicBodies;
+        this.gravities = gravities;
     }
 
     @Override
@@ -164,9 +168,12 @@ public class BodyMovingSystem extends IntervalSystem {
         MovingBodyComponent movingBody = movingBodies.get(entity);
         KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
         Transform kinematicTransform = transforms.get(entity).transform;
+        Vector2 gravity = gravities.get(entity).gravity;
         resetCollisions(kinematicBody);
-        moveKinematicX(delta * movingBody.speed.x, kinematicBody, kinematicTransform);
-        moveKinematicY(delta * movingBody.speed.y, kinematicBody, movingBody, kinematicTransform);
+        float dX = delta * (movingBody.speed.x + delta * gravity.x / 2);
+        moveKinematicX(dX, kinematicBody, kinematicTransform);
+        float dY = delta * (movingBody.speed.y + delta * gravity.x / 2);
+        moveKinematicY(dY, kinematicBody, movingBody, kinematicTransform);
     }
 
     private void resetCollisions(KinematicBodyComponent kinematicBody) {
