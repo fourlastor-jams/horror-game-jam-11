@@ -11,10 +11,12 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Null;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.SensorBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import javax.inject.Inject;
@@ -24,7 +26,8 @@ import javax.inject.Inject;
  */
 public class BodyMovingSystem extends IntervalSystem {
 
-    private static final Family FAMILY_SOLID_IMMOBILE = Family.all(SolidBodyComponent.class)
+    private static final Family FAMILY_IMMOBILE = Family
+            .one(SolidBodyComponent.class, SensorBodyComponent.class)
             .exclude(MovingBodyComponent.class)
             .get();
     private static final Family FAMILY_SOLID_MOVING =
@@ -37,23 +40,27 @@ public class BodyMovingSystem extends IntervalSystem {
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
+    private final ComponentMapper<SolidBodyComponent> sensorBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
     private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> solidMovingEntities;
     private ImmutableArray<Entity> kinematicEntities;
     private IntMap<Array<Entity>> immobileSolids;
+    private IntMap<Array<Entity>> immobileSensors;
 
     @Inject
     public BodyMovingSystem(
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<MovingBodyComponent> movingBodies,
             ComponentMapper<SolidBodyComponent> solidBodies,
+            ComponentMapper<SolidBodyComponent> sensorBodies,
             ComponentMapper<KinematicBodyComponent> kinematicBodies,
             ComponentMapper<GravityComponent> gravities) {
         super(INTERVAL);
         this.transforms = transforms;
         this.movingBodies = movingBodies;
         this.solidBodies = solidBodies;
+        this.sensorBodies = sensorBodies;
         this.kinematicBodies = kinematicBodies;
         this.gravities = gravities;
     }
@@ -61,16 +68,18 @@ public class BodyMovingSystem extends IntervalSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        engine.addEntityListener(FAMILY_SOLID_IMMOBILE, solidChunkListener);
+        engine.addEntityListener(FAMILY_IMMOBILE, chunkMappingListener);
         immobileSolids = new IntMap<>();
+        immobileSensors = new IntMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
         kinematicEntities = engine.getEntitiesFor(FAMILY_KINEMATIC);
     }
 
     @Override
     public void removedFromEngine(Engine engine) {
-        engine.removeEntityListener(solidChunkListener);
+        engine.removeEntityListener(chunkMappingListener);
         immobileSolids = null;
+        immobileSensors = null;
         solidMovingEntities = null;
         kinematicEntities = null;
         super.removedFromEngine(engine);
@@ -288,10 +297,14 @@ public class BodyMovingSystem extends IntervalSystem {
                 || offsetBy(kinematicArea, 0, 3).overlaps(solidArea);
     }
 
-    private final EntityListener solidChunkListener = new EntityListener() {
+    private final EntityListener chunkMappingListener = new EntityListener() {
         @Override
         public void entityAdded(Entity entity) {
             Transform area = transforms.get(entity).transform;
+            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            if (immobileMap == null) {
+                return;
+            }
             int startX = (int) (area.left() / CHUNK_SIZE);
             int endX = (int) (area.right() / CHUNK_SIZE);
             int startY = (int) (area.bottom() / CHUNK_SIZE);
@@ -299,10 +312,10 @@ public class BodyMovingSystem extends IntervalSystem {
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
                     int fused = fusedCoordinates(x, y);
-                    if (!immobileSolids.containsKey(fused)) {
-                        immobileSolids.put(fused, new Array<>());
+                    if (!immobileMap.containsKey(fused)) {
+                        immobileMap.put(fused, new Array<>());
                     }
-                    immobileSolids.get(fused).add(entity);
+                    immobileMap.get(fused).add(entity);
                 }
             }
         }
@@ -310,6 +323,10 @@ public class BodyMovingSystem extends IntervalSystem {
         @Override
         public void entityRemoved(Entity entity) {
             Transform area = transforms.get(entity).transform;
+            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            if (immobileMap == null) {
+                return;
+            }
             int startX = (int) (area.left() / CHUNK_SIZE);
             int endX = (int) (area.right() / CHUNK_SIZE);
             int startY = (int) (area.bottom() / CHUNK_SIZE);
@@ -317,11 +334,22 @@ public class BodyMovingSystem extends IntervalSystem {
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
                     int fused = fusedCoordinates(x, y);
-                    if (!immobileSolids.containsKey(fused)) {
+                    if (!immobileMap.containsKey(fused)) {
                         continue;
                     }
-                    immobileSolids.get(fused).removeValue(entity, true);
+                    immobileMap.get(fused).removeValue(entity, true);
                 }
+            }
+        }
+
+        @Null
+        private IntMap<Array<Entity>> mapFor(Entity entity) {
+            if (solidBodies.has(entity)) {
+                return immobileSolids;
+            } else if (sensorBodies.has(entity)) {
+                return immobileSensors;
+            } else {
+                return null;
             }
         }
     };
