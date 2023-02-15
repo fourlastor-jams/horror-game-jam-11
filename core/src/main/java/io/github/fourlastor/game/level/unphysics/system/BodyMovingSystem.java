@@ -40,7 +40,7 @@ public class BodyMovingSystem extends IntervalSystem {
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
-    private final ComponentMapper<SolidBodyComponent> sensorBodies;
+    private final ComponentMapper<SensorBodyComponent> sensorBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
     private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> solidMovingEntities;
@@ -53,7 +53,7 @@ public class BodyMovingSystem extends IntervalSystem {
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<MovingBodyComponent> movingBodies,
             ComponentMapper<SolidBodyComponent> solidBodies,
-            ComponentMapper<SolidBodyComponent> sensorBodies,
+            ComponentMapper<SensorBodyComponent> sensorBodies,
             ComponentMapper<KinematicBodyComponent> kinematicBodies,
             ComponentMapper<GravityComponent> gravities) {
         super(INTERVAL);
@@ -187,6 +187,9 @@ public class BodyMovingSystem extends IntervalSystem {
 
     private void resetCollisions(KinematicBodyComponent kinematicBody) {
         kinematicBody.collision.set(0, 0);
+        if (!kinematicBody.sensors.isEmpty()) {
+            kinematicBody.sensors.clear();
+        }
     }
 
     public void moveKinematicX(float amount, KinematicBodyComponent kinematicBody, Transform transform) {
@@ -233,6 +236,7 @@ public class BodyMovingSystem extends IntervalSystem {
             // There is no Solid immediately beside us
             kinematicBody.touching.x = 0;
             transform.moveXBy(amount);
+            checkSensors(kinematicBody, transform.area());
             return false;
         }
     }
@@ -250,6 +254,7 @@ public class BodyMovingSystem extends IntervalSystem {
             // There is no Solid immediately beside us
             kinematicBody.touching.y = 0;
             transform.moveYBy(amount);
+            checkSensors(kinematicBody, transform.area());
             return false;
         }
     }
@@ -261,11 +266,34 @@ public class BodyMovingSystem extends IntervalSystem {
         return tmp.setPosition(tmp.x + x, tmp.y + y);
     }
 
+    private void checkSensors(KinematicBodyComponent bodyComponent, Rectangle area) {
+        int startX = chunkStartX(area);
+        int endX = chunkEndX(area);
+        int startY = chunkStartY(area);
+        int endY = chunkEndY(area);
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                int fused = fusedCoordinates(x, y);
+                Array<Entity> entities = immobileSensors.get(fused);
+                if (entities == null) continue;
+                for (Entity entity : entities) {
+                    if (checkSensor(area, sensorBodies.get(entity), transforms.get(entity).transform)) {
+                        bodyComponent.sensors.add(entity);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean checkSensor(Rectangle area, SensorBodyComponent sensorBody, Transform transform) {
+        return sensorBody.canCollide && transform.area().overlaps(area);
+    }
+
     private boolean collides(Rectangle area) {
-        int startX = (int) (area.x / CHUNK_SIZE);
-        int endX = (int) ((area.x + area.width) / CHUNK_SIZE);
-        int startY = (int) (area.y / CHUNK_SIZE);
-        int endY = (int) ((area.y + area.height) / CHUNK_SIZE);
+        int startX = chunkStartX(area);
+        int endX = chunkEndX(area);
+        int startY = chunkStartY(area);
+        int endY = chunkEndY(area);
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
                 int fused = fusedCoordinates(x, y);
@@ -284,6 +312,22 @@ public class BodyMovingSystem extends IntervalSystem {
             }
         }
         return false;
+    }
+
+    private static int chunkStartX(Rectangle area) {
+        return (int) (area.x / CHUNK_SIZE);
+    }
+
+    private static int chunkEndX(Rectangle area) {
+        return (int) ((area.x + area.width) / CHUNK_SIZE);
+    }
+
+    private static int chunkStartY(Rectangle area) {
+        return (int) (area.y / CHUNK_SIZE);
+    }
+
+    private static int chunkEndY(Rectangle area) {
+        return (int) ((area.y + area.height) / CHUNK_SIZE);
     }
 
     private boolean collides(Rectangle area, SolidBodyComponent body, Transform solidTransform) {

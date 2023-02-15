@@ -10,7 +10,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
@@ -27,6 +26,7 @@ import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.SensorBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import io.github.fourlastor.harlequin.animation.AnimationNode;
@@ -166,35 +166,8 @@ public class EntitiesFactory {
                 float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
                 actor.setPosition(x * scale, y * scale);
                 entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
-                entity.add(new BodyBuilderComponent(world -> {
-                    BodyDef def = new BodyDef();
-                    def.type = BodyDef.BodyType.StaticBody;
-                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
-                    Body body = world.createBody(def);
-                    FixtureDef fixtureDef = new FixtureDef();
-                    PolygonShape shape = new PolygonShape();
-                    float ratio = config.entities.spikeSizeRatio;
-                    float invertedRatio = 1f - ratio;
-                    float centerX = scale
-                            * instance.halfWidth()
-                            * invertedRatio
-                            * (tileName.endsWith("left") ? -1f : tileName.endsWith("right") ? 1f : 0f);
-                    float centerY = scale
-                            * instance.halfHeight()
-                            * invertedRatio
-                            * (tileName.endsWith("bottom") ? -1f : tileName.endsWith("top") ? 1f : 0f);
-                    shape.setAsBox(
-                            instance.halfWidth() * scale * ratio,
-                            instance.halfHeight() * scale * ratio,
-                            new Vector2(centerX, centerY),
-                            0f);
-                    fixtureDef.shape = shape;
-                    fixtureDef.isSensor = true;
-                    fixtureDef.filter.categoryBits = Bits.Category.SPIKE.bits;
-                    fixtureDef.filter.maskBits = Bits.Mask.SPIKE.bits;
-                    body.createFixture(fixtureDef);
-                    return body;
-                }));
+                entity.add(new SensorBodyComponent());
+                entity.add(new TransformComponent(new Transform(new Rectangle(x, y, instance.width, instance.height))));
                 entities.add(entity);
             }
         }
