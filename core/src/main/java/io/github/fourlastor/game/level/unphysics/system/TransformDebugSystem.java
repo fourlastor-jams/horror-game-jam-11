@@ -61,7 +61,7 @@ public class TransformDebugSystem extends IteratingSystem {
             drawer.setColor(Color.PINK);
         } else if (solidBodies.has(entity)) {
             drawer.setColor(Color.CYAN);
-        }  else if (sensorBodies.has(entity)) {
+        } else if (sensorBodies.has(entity)) {
             drawer.setColor(Color.GOLD);
         } else {
             drawer.setColor(Color.WHITE);

@@ -9,20 +9,21 @@ import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
-
 import javax.inject.Inject;
 
 public class DeathSystem extends IteratingSystem {
 
-    private static final Family FAMILY = Family.all(
-                    KinematicBodyComponent.class, PlayerComponent.class)
-            .get();
+    private static final Family FAMILY =
+            Family.all(KinematicBodyComponent.class, PlayerComponent.class).get();
     private final ComponentMapper<KinematicBodyComponent> bodies;
     private final ComponentMapper<SpikeComponent> spikes;
     private final MessageDispatcher messageDispatcher;
 
     @Inject
-    public DeathSystem(ComponentMapper<KinematicBodyComponent> bodies, ComponentMapper<SpikeComponent> spikes, MessageDispatcher messageDispatcher) {
+    public DeathSystem(
+            ComponentMapper<KinematicBodyComponent> bodies,
+            ComponentMapper<SpikeComponent> spikes,
+            MessageDispatcher messageDispatcher) {
         super(FAMILY);
         this.bodies = bodies;
         this.spikes = spikes;

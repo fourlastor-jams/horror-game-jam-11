@@ -26,8 +26,7 @@ import javax.inject.Inject;
  */
 public class BodyMovingSystem extends IntervalSystem {
 
-    private static final Family FAMILY_IMMOBILE = Family
-            .one(SolidBodyComponent.class, SensorBodyComponent.class)
+    private static final Family FAMILY_IMMOBILE = Family.one(SolidBodyComponent.class, SensorBodyComponent.class)
             .exclude(MovingBodyComponent.class)
             .get();
     private static final Family FAMILY_SOLID_MOVING =
