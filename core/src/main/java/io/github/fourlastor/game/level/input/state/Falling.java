@@ -2,13 +2,14 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.GameConfig;
-import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
+import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 
 abstract class Falling extends HorizontalMovement {
 
@@ -19,11 +20,13 @@ abstract class Falling extends HorizontalMovement {
 
     public Falling(
             ComponentMapper<PlayerComponent> players,
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<KinematicBodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
             ComponentMapper<InputComponent> inputs,
+            ComponentMapper<MovingBodyComponent> moving,
+            ComponentMapper<TransformComponent> transforms,
             GameConfig config) {
-        super(players, bodies, animated, inputs, config);
+        super(players, bodies, animated, inputs, moving, transforms, config);
         this.config = config;
     }
 
@@ -41,6 +44,13 @@ abstract class Falling extends HorizontalMovement {
         super.enter(entity);
         fallingTime = 0f;
         attemptedTime = -1f;
+        entity.getComponent(GravityComponent.class).gravity.scl(config.player.fallingGravityRatio);
+    }
+
+    @Override
+    public void exit(Entity entity) {
+        entity.getComponent(GravityComponent.class).gravity.scl(1 / config.player.fallingGravityRatio);
+        super.exit(entity);
     }
 
     @Override
@@ -50,19 +60,13 @@ abstract class Falling extends HorizontalMovement {
         if (inputs.get(entity).jumpJustPressed) {
             attemptedTime = fallingTime;
         }
-    }
-
-    @Override
-    public boolean onMessage(Entity entity, Telegram telegram) {
-        if (telegram.message == Message.PLAYER_ON_GROUND.ordinal()) {
+        if (bodies.get(entity).touching.y == -1) {
             PlayerComponent playerComponent = players.get(entity);
             if (attemptedTime >= 0 && fallingTime - attemptedTime < config.player.fallingGraceTime) {
                 playerComponent.stateMachine.changeState(playerComponent.jumping);
             } else {
                 playerComponent.stateMachine.changeState(playerComponent.idle);
             }
-            return true;
         }
-        return super.onMessage(entity, telegram);
     }
 }

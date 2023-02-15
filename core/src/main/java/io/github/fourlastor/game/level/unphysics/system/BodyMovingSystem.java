@@ -24,8 +24,9 @@ import javax.inject.Inject;
  */
 public class BodyMovingSystem extends IntervalSystem {
 
-    private static final Family FAMILY_SOLID_IMMOBILE =
-            Family.all(SolidBodyComponent.class).exclude(MovingBodyComponent.class).get();
+    private static final Family FAMILY_SOLID_IMMOBILE = Family.all(SolidBodyComponent.class)
+            .exclude(MovingBodyComponent.class)
+            .get();
     private static final Family FAMILY_SOLID_MOVING =
             Family.all(MovingBodyComponent.class, SolidBodyComponent.class).get();
     private static final Family FAMILY_KINEMATIC =
@@ -47,7 +48,8 @@ public class BodyMovingSystem extends IntervalSystem {
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<MovingBodyComponent> movingBodies,
             ComponentMapper<SolidBodyComponent> solidBodies,
-            ComponentMapper<KinematicBodyComponent> kinematicBodies, ComponentMapper<GravityComponent> gravities) {
+            ComponentMapper<KinematicBodyComponent> kinematicBodies,
+            ComponentMapper<GravityComponent> gravities) {
         super(INTERVAL);
         this.transforms = transforms;
         this.movingBodies = movingBodies;
@@ -118,18 +120,14 @@ public class BodyMovingSystem extends IntervalSystem {
             if (moveX > 0) {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicX(
-                            solidTransform.right() - kinematicTransform.left(),
-                            kinematicBody,
-                            kinematicTransform);
+                            solidTransform.right() - kinematicTransform.left(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
             } else {
                 if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
                     moveKinematicX(
-                            solidTransform.left() - kinematicTransform.right(),
-                            kinematicBody,
-                            kinematicTransform);
+                            solidTransform.left() - kinematicTransform.right(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
@@ -147,7 +145,8 @@ public class BodyMovingSystem extends IntervalSystem {
                     moveKinematicY(
                             solidTransform.top() - kinematicTransform.bottom(),
                             kinematicBody,
-                            movingBody, kinematicTransform);
+                            movingBody,
+                            kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
@@ -156,7 +155,8 @@ public class BodyMovingSystem extends IntervalSystem {
                     moveKinematicY(
                             solidTransform.bottom() - kinematicTransform.top(),
                             kinematicBody,
-                            movingBody, kinematicTransform);
+                            movingBody,
+                            kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
@@ -180,8 +180,7 @@ public class BodyMovingSystem extends IntervalSystem {
         kinematicBody.collision.set(0, 0);
     }
 
-    public void moveKinematicX(
-            float amount, KinematicBodyComponent kinematicBody, Transform transform) {
+    public void moveKinematicX(float amount, KinematicBodyComponent kinematicBody, Transform transform) {
         int move = (int) amount;
         int sign = Integer.signum(move);
         if (move != 0) {
@@ -229,7 +228,8 @@ public class BodyMovingSystem extends IntervalSystem {
         }
     }
 
-    private boolean attemptMoveY(KinematicBodyComponent kinematicBody, MovingBodyComponent movingBody, Transform transform, float amount) {
+    private boolean attemptMoveY(
+            KinematicBodyComponent kinematicBody, MovingBodyComponent movingBody, Transform transform, float amount) {
         float direction = Math.signum(amount);
         if (collides(offsetBy(transform.area(), 0, direction))) {
             // Collision with Solid
@@ -287,7 +287,6 @@ public class BodyMovingSystem extends IntervalSystem {
         return kinematicArea.overlaps(solidArea)
                 || offsetBy(kinematicArea, 0, 3).overlaps(solidArea);
     }
-
 
     private final EntityListener solidChunkListener = new EntityListener() {
         @Override

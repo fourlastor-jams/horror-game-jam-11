@@ -6,14 +6,18 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 
 public abstract class CharacterState implements State<Entity> {
 
     protected final ComponentMapper<PlayerComponent> players;
-    protected final ComponentMapper<BodyComponent> bodies;
+    protected final ComponentMapper<KinematicBodyComponent> bodies;
+    protected final ComponentMapper<MovingBodyComponent> moving;
+    protected final ComponentMapper<TransformComponent> transforms;
     protected final ComponentMapper<AnimatedComponent> animated;
     protected final ComponentMapper<InputComponent> inputs;
 
@@ -21,11 +25,15 @@ public abstract class CharacterState implements State<Entity> {
 
     public CharacterState(
             ComponentMapper<PlayerComponent> players,
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<KinematicBodyComponent> bodies,
+            ComponentMapper<MovingBodyComponent> moving,
+            ComponentMapper<TransformComponent> transforms,
             ComponentMapper<AnimatedComponent> animated,
             ComponentMapper<InputComponent> inputs) {
         this.players = players;
         this.bodies = bodies;
+        this.moving = moving;
+        this.transforms = transforms;
         this.animated = animated;
         this.inputs = inputs;
     }

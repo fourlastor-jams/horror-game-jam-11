@@ -25,8 +25,7 @@ public class GravitySystem extends IntervalSystem {
 
     @Inject
     public GravitySystem(
-            ComponentMapper<MovingBodyComponent> movingBodies,
-            ComponentMapper<GravityComponent> gravities) {
+            ComponentMapper<MovingBodyComponent> movingBodies, ComponentMapper<GravityComponent> gravities) {
         super(INTERVAL);
         this.movingBodies = movingBodies;
         this.gravities = gravities;

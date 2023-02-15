@@ -3,12 +3,13 @@ package io.github.fourlastor.game.level.input.state;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.physics.box2d.Body;
 import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
 public abstract class HorizontalMovement extends CharacterState {
@@ -17,11 +18,13 @@ public abstract class HorizontalMovement extends CharacterState {
 
     public HorizontalMovement(
             ComponentMapper<PlayerComponent> players,
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<KinematicBodyComponent> bodies,
             ComponentMapper<AnimatedComponent> animated,
             ComponentMapper<InputComponent> inputs,
+            ComponentMapper<MovingBodyComponent> moving,
+            ComponentMapper<TransformComponent> transforms,
             GameConfig config) {
-        super(players, bodies, animated, inputs);
+        super(players, bodies, moving, transforms, animated, inputs);
         this.config = config;
     }
 
@@ -38,13 +41,13 @@ public abstract class HorizontalMovement extends CharacterState {
         boolean goingRight = input.rightPressed;
         if (goingLeft || goingRight) {
             float target = goingLeft ? -config.player.movementSpeed : config.player.movementSpeed;
-            velocity = Interpolation.exp5.apply(progress) * target;
+            velocity = Interpolation.pow2.apply(progress) * target;
             AnimationStateMachine stateMachine = animated.get(entity).stateMachine;
             float scale = Math.abs(stateMachine.getScaleX());
             stateMachine.setScaleX(scale * (goingLeft ? -1 : 1));
         } else {
             float target = Math.signum(velocity) * config.player.movementSpeed;
-            velocity = Interpolation.exp5.apply(1 - progress) * target;
+            velocity = Interpolation.pow2.apply(1 - progress) * target;
         }
         updateBodyVelocity(entity);
     }
@@ -57,9 +60,8 @@ public abstract class HorizontalMovement extends CharacterState {
     }
 
     protected void updateBodyVelocity(Entity entity) {
-        Body body = bodies.get(entity).body;
-        float yVelocity = body.getLinearVelocity().y;
-        body.setLinearVelocity(velocity, yVelocity);
+        MovingBodyComponent body = moving.get(entity);
+        body.speed.x = velocity;
     }
 
     protected final boolean isMoving() {
