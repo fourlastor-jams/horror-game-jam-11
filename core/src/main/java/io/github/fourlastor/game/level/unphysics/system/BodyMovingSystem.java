@@ -225,6 +225,9 @@ public class BodyMovingSystem extends IntervalSystem {
     }
 
     private boolean attemptMoveX(KinematicBodyComponent kinematicBody, Transform transform, float amount) {
+        if (amount == 0) {
+            return false;
+        }
         float direction = Math.signum(amount);
         if (collides(offsetBy(transform.area(), direction, 0))) {
             // Collision with Solid
@@ -242,6 +245,9 @@ public class BodyMovingSystem extends IntervalSystem {
 
     private boolean attemptMoveY(
             KinematicBodyComponent kinematicBody, MovingBodyComponent movingBody, Transform transform, float amount) {
+        if (amount == 0) {
+            return false;
+        }
         float direction = Math.signum(amount);
         if (collides(offsetBy(transform.area(), 0, direction))) {
             // Collision with Solid
