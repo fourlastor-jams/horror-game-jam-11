@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
+import io.github.fourlastor.game.level.unphysics.component.SensorBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import javax.inject.Inject;
@@ -25,6 +26,7 @@ public class TransformDebugSystem extends IteratingSystem {
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
+    private final ComponentMapper<SensorBodyComponent> sensorBodies;
     private final ShapeDrawer drawer;
     private final Batch batch;
 
@@ -33,12 +35,14 @@ public class TransformDebugSystem extends IteratingSystem {
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<SolidBodyComponent> solidBodies,
             ComponentMapper<KinematicBodyComponent> kinematicBodies,
+            ComponentMapper<SensorBodyComponent> sensorBodies,
             Stage stage,
             TextureAtlas atlas) {
         super(FAMILY);
         this.transforms = transforms;
         this.solidBodies = solidBodies;
         this.kinematicBodies = kinematicBodies;
+        this.sensorBodies = sensorBodies;
         batch = stage.getBatch();
         drawer = new ShapeDrawer(batch, atlas.findRegion("whitePixel"));
     }
@@ -57,6 +61,8 @@ public class TransformDebugSystem extends IteratingSystem {
             drawer.setColor(Color.PINK);
         } else if (solidBodies.has(entity)) {
             drawer.setColor(Color.CYAN);
+        }  else if (sensorBodies.has(entity)) {
+            drawer.setColor(Color.GOLD);
         } else {
             drawer.setColor(Color.WHITE);
         }
