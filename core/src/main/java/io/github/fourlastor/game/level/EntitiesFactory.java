@@ -19,6 +19,7 @@ import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
+import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.physics.Bits;
@@ -168,6 +169,7 @@ public class EntitiesFactory {
                 entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
                 entity.add(new SensorBodyComponent());
                 entity.add(new TransformComponent(new Transform(new Rectangle(x, y, instance.width, instance.height))));
+                entity.add(new SpikeComponent());
                 entities.add(entity);
             }
         }

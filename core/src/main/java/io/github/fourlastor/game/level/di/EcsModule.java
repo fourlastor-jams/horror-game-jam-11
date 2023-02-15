@@ -12,6 +12,7 @@ import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
+import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
@@ -111,5 +112,11 @@ public class EcsModule {
     @ScreenScoped
     public ComponentMapper<SensorBodyComponent> sensorBodyComponent() {
         return ComponentMapper.getFor(SensorBodyComponent.class);
+    }
+
+    @Provides
+    @ScreenScoped
+    public ComponentMapper<SpikeComponent> spikeComponent() {
+        return ComponentMapper.getFor(SpikeComponent.class);
     }
 }

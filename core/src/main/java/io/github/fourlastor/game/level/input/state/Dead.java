@@ -2,6 +2,7 @@ package io.github.fourlastor.game.level.input.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
@@ -30,4 +31,9 @@ public class Dead extends CharacterState {
 
     @Override
     public void update(Entity entity) {}
+
+    @Override
+    public boolean onMessage(Entity entity, Telegram telegram) {
+        return false;
+    }
 }
