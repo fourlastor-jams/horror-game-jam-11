@@ -5,15 +5,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import javax.inject.Inject;
 
 public class Intact extends FalseFloorState {
 
     @Inject
     public Intact(
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<SolidBodyComponent> bodies,
             ComponentMapper<ActorComponent> actors,
             ComponentMapper<FalseFloorComponent> inputs) {
         super(bodies, actors, inputs);

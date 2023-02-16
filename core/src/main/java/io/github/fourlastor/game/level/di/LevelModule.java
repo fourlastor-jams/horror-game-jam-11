@@ -45,7 +45,7 @@ public class LevelModule {
         Engine engine = new Engine();
         engine.addSystem(inputBufferSystem);
         engine.addSystem(characterStateSystem);
-        //        engine.addSystem(falseFloorSystem);
+        engine.addSystem(falseFloorSystem);
         engine.addSystem(bodyMovingSystem);
         engine.addSystem(gravitySystem);
         engine.addSystem(deathSystem);
@@ -53,7 +53,7 @@ public class LevelModule {
         engine.addSystem(cameraMovementSystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        engine.addSystem(transformDebugSystem);
+        //        engine.addSystem(transformDebugSystem);
         return engine;
     }
 

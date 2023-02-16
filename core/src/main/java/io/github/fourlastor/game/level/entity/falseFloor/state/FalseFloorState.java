@@ -5,19 +5,19 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 
 public abstract class FalseFloorState implements State<Entity> {
 
-    protected final ComponentMapper<BodyComponent> bodies;
+    protected final ComponentMapper<SolidBodyComponent> bodies;
     protected final ComponentMapper<ActorComponent> actors;
     protected final ComponentMapper<FalseFloorComponent> falseFloors;
 
     private float delta;
 
     public FalseFloorState(
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<SolidBodyComponent> bodies,
             ComponentMapper<ActorComponent> actors,
             ComponentMapper<FalseFloorComponent> falseFloors) {
         this.bodies = bodies;

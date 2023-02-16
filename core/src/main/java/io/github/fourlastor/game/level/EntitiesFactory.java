@@ -5,24 +5,17 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
 import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
-import io.github.fourlastor.game.level.physics.Bits;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
@@ -168,10 +161,9 @@ public class EntitiesFactory {
                 actor.setPosition(x * scale, y * scale);
                 entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
                 entity.add(new SensorBodyComponent());
-                entity.add(new TransformComponent(new Transform(
-                        new Rectangle(x, y, instance.width / 2f, instance.height)
-                        .setCenter(x + instance.width / 2f, y + instance.height / 2f)
-                )));
+                entity.add(
+                        new TransformComponent(new Transform(new Rectangle(x, y, instance.width / 2f, instance.height)
+                                .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
                 entity.add(new SpikeComponent());
                 entities.add(entity);
             }
@@ -193,36 +185,10 @@ public class EntitiesFactory {
                 float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
                 actor.setPosition(x * scale, y * scale);
                 entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
-                entity.add(new BodyBuilderComponent(world -> {
-                    BodyDef def = new BodyDef();
-                    def.type = BodyDef.BodyType.StaticBody;
-                    def.position.set((x + instance.halfWidth()) * scale, (y + instance.halfHeight()) * scale);
-                    Body body = world.createBody(def);
-                    FixtureDef fixtureDef = new FixtureDef();
-
-                    ChainShape shape = new ChainShape();
-
-                    float centerAdjustX = instance.halfWidth() * scale;
-                    float centerAdjustY = instance.halfHeight() * scale * 3f / 16f;
-
-                    float[] vertices = new float[] {
-                        -centerAdjustX,
-                        -centerAdjustY,
-                        -centerAdjustX,
-                        centerAdjustY,
-                        centerAdjustX,
-                        centerAdjustY,
-                        centerAdjustX,
-                        -centerAdjustY,
-                    };
-                    shape.createLoop(vertices);
-                    fixtureDef.shape = shape;
-                    fixtureDef.filter.categoryBits = Bits.Category.GROUND.bits;
-                    fixtureDef.filter.maskBits = Bits.Mask.GROUND.bits;
-                    Fixture fixture = body.createFixture(fixtureDef);
-                    fixture.setUserData(entity);
-                    return body;
-                }));
+                entity.add(new SolidBodyComponent());
+                entity.add(new TransformComponent(
+                        new Transform(new Rectangle(x, y, instance.width, instance.height * 3f / 16f)
+                                .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
                 entity.add(new FalseFloorComponent.Request());
                 entities.add(entity);
             }
