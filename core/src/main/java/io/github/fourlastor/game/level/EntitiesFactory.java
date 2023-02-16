@@ -168,7 +168,10 @@ public class EntitiesFactory {
                 actor.setPosition(x * scale, y * scale);
                 entity.add(new ActorComponent(actor, ActorComponent.Layer.PLATFORM));
                 entity.add(new SensorBodyComponent());
-                entity.add(new TransformComponent(new Transform(new Rectangle(x, y, instance.width, instance.height))));
+                entity.add(new TransformComponent(new Transform(
+                        new Rectangle(x, y, instance.width / 2f, instance.height)
+                        .setCenter(x + instance.width / 2f, y + instance.height / 2f)
+                )));
                 entity.add(new SpikeComponent());
                 entities.add(entity);
             }
