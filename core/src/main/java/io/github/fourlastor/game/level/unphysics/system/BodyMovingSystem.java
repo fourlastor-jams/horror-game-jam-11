@@ -4,8 +4,8 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +24,7 @@ import javax.inject.Inject;
 /**
  * @see <a href=https://maddythorson.medium.com/celeste-and-towerfall-physics-d24bd2ae0fc5>Tutorial by Maddy Thorson</a>
  */
-public class BodyMovingSystem extends IntervalSystem {
+public class BodyMovingSystem extends EntitySystem {
 
     private static final Family FAMILY_IMMOBILE = Family.one(SolidBodyComponent.class, SensorBodyComponent.class)
             .exclude(MovingBodyComponent.class)
@@ -33,7 +33,6 @@ public class BodyMovingSystem extends IntervalSystem {
             Family.all(MovingBodyComponent.class, SolidBodyComponent.class).get();
     private static final Family FAMILY_KINEMATIC =
             Family.all(MovingBodyComponent.class, KinematicBodyComponent.class).get();
-    private static final float INTERVAL = 1f / 60f;
     private static final float CHUNK_SIZE = 16 * 5f;
 
     private final ComponentMapper<TransformComponent> transforms;
@@ -55,7 +54,6 @@ public class BodyMovingSystem extends IntervalSystem {
             ComponentMapper<SensorBodyComponent> sensorBodies,
             ComponentMapper<KinematicBodyComponent> kinematicBodies,
             ComponentMapper<GravityComponent> gravities) {
-        super(INTERVAL);
         this.transforms = transforms;
         this.movingBodies = movingBodies;
         this.solidBodies = solidBodies;
@@ -85,12 +83,12 @@ public class BodyMovingSystem extends IntervalSystem {
     }
 
     @Override
-    protected void updateInterval() {
+    public void update(float deltaTime) {
         for (Entity entity : kinematicEntities) {
-            moveKinematic(entity, INTERVAL);
+            moveKinematic(entity, deltaTime);
         }
         for (Entity entity : solidMovingEntities) {
-            moveSolid(entity, INTERVAL);
+            moveSolid(entity, deltaTime);
         }
     }
 
