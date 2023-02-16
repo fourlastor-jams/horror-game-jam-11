@@ -34,6 +34,7 @@ public class BodyMovingSystem extends EntitySystem {
     private static final Family FAMILY_KINEMATIC =
             Family.all(MovingBodyComponent.class, KinematicBodyComponent.class).get();
     private static final float CHUNK_SIZE = 16 * 5f;
+    private static final float STEP = 1f / 60f;
 
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
@@ -84,11 +85,14 @@ public class BodyMovingSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        for (Entity entity : kinematicEntities) {
-            moveKinematic(entity, deltaTime);
-        }
-        for (Entity entity : solidMovingEntities) {
-            moveSolid(entity, deltaTime);
+        while (deltaTime > 0f) {
+            for (Entity entity : kinematicEntities) {
+                moveKinematic(entity, deltaTime);
+            }
+            for (Entity entity : solidMovingEntities) {
+                moveSolid(entity, deltaTime);
+            }
+            deltaTime -= STEP;
         }
     }
 
