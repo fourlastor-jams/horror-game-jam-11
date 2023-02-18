@@ -1,26 +1,31 @@
 package io.github.fourlastor.game.level.entity.timedFloor;
 
 import com.badlogic.ashley.core.Component;
-import io.github.fourlastor.game.level.entity.timedFloor.state.Degraded;
-import io.github.fourlastor.game.level.entity.timedFloor.state.Degrading;
-import io.github.fourlastor.game.level.entity.timedFloor.state.Intact;
+import io.github.fourlastor.game.level.entity.timedFloor.state.Disabled;
+import io.github.fourlastor.game.level.entity.timedFloor.state.Enabled;
 
 public class TimedFloorComponent implements Component {
 
     public final TimedFloorStateMachine stateMachine;
-    public final Intact intact;
-    public final Degrading degrading;
-    public final Degraded degraded;
+    public final Enabled enabled;
+    public final Disabled disabled;
 
-    public TimedFloorComponent(
-            TimedFloorStateMachine stateMachine, Intact intact, Degrading degrading, Degraded degraded) {
+    public final float period;
+
+    public TimedFloorComponent(TimedFloorStateMachine stateMachine, Enabled enabled, Disabled disabled, float period) {
         this.stateMachine = stateMachine;
-        this.intact = intact;
-        this.degrading = degrading;
-        this.degraded = degraded;
+        this.enabled = enabled;
+        this.disabled = disabled;
+        this.period = period;
     }
 
-    public static class Request implements Component {}
+    public static class Request implements Component {
+        public final boolean enabled;
+        public final float period;
 
-    public static class Removal implements Component {}
+        public Request(boolean enabled, float period) {
+            this.enabled = enabled;
+            this.period = period;
+        }
+    }
 }

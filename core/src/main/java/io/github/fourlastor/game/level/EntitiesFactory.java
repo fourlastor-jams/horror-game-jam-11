@@ -189,7 +189,9 @@ public class EntitiesFactory {
                 entity.add(new TransformComponent(
                         new Transform(new Rectangle(x, y, instance.width, instance.height * 3f / 16f)
                                 .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
-                entity.add(new TimedFloorComponent.Request());
+                boolean enabled = instance.field("Colliding").booleanValue;
+                float period = instance.field("Period").floatValue;
+                entity.add(new TimedFloorComponent.Request(enabled, period));
                 entities.add(entity);
             }
         }

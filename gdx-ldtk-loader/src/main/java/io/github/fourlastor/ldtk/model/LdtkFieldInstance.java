@@ -35,7 +35,12 @@ public class LdtkFieldInstance {
     public final LdtkTileRect tile;
 
     public LdtkFieldInstance(
-            String identifier, String type, float floatValue, boolean booleanValue, int defUid, @Null LdtkTileRect tile) {
+            String identifier,
+            String type,
+            float floatValue,
+            boolean booleanValue,
+            int defUid,
+            @Null LdtkTileRect tile) {
         this.identifier = identifier;
         this.type = type;
         this.floatValue = floatValue;
@@ -68,7 +73,8 @@ public class LdtkFieldInstance {
             return new LdtkFieldInstance(
                     value.getString("__identifier"),
                     type,
-                    floatVal, booleanVal,
+                    floatVal,
+                    booleanVal,
                     value.getInt("defUid"),
                     getOptional(value, "__tile", tileParser::parse));
         }
