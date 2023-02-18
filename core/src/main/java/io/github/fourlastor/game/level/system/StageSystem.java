@@ -6,6 +6,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -32,8 +34,22 @@ public class StageSystem extends EntitySystem implements EntityListener {
         }
     }
 
+    private final Rectangle cullingArea = new Rectangle();
+
     @Override
     public void update(float deltaTime) {
+        for (int i = 0; i < layers.size(); i++) {
+            Group layer = layers.get(i);
+            Camera camera = stage.getCamera();
+            float halfWidth = camera.viewportWidth / 2;
+            float halfHeight = camera.viewportHeight / 2;
+            cullingArea.set(
+                    camera.position.x - halfWidth,
+                    camera.position.y - halfHeight,
+                    camera.viewportWidth,
+                    camera.viewportHeight);
+            layer.setCullingArea(cullingArea);
+        }
         stage.act(deltaTime);
         stage.draw();
     }

@@ -10,7 +10,7 @@ public interface Controls {
     Control jump();
 
     enum Setup implements Controls {
-        P1(Input.Keys.A, Input.Keys.D, Input.Keys.SPACE);
+        P1(Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.SPACE);
 
         private final KeysControl left;
         private final KeysControl right;
