@@ -31,11 +31,6 @@ public class MovingSystem extends IteratingSystem {
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-    }
-
-    @Override
     protected void processEntity(Entity entity, float deltaTime) {
         MovingComponent movingComponent = movables.get(entity);
         Vector2 position = transforms.get(entity).transform.area().getPosition(this.position);
