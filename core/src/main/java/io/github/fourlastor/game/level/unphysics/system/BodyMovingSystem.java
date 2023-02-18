@@ -10,7 +10,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.Null;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
@@ -45,8 +45,8 @@ public class BodyMovingSystem extends EntitySystem {
     private ImmutableArray<Entity> solidMovingEntities;
     private Array<Entity> solidMovingEntitiesCollisions;
     private ImmutableArray<Entity> kinematicEntities;
-    private IntMap<Array<Entity>> immobileSolids;
-    private IntMap<Array<Entity>> immobileSensors;
+    private LongMap<Array<Entity>> immobileSolids;
+    private LongMap<Array<Entity>> immobileSensors;
 
     @Inject
     public BodyMovingSystem(
@@ -68,8 +68,8 @@ public class BodyMovingSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         engine.addEntityListener(FAMILY_IMMOBILE, chunkMappingListener);
-        immobileSolids = new IntMap<>();
-        immobileSensors = new IntMap<>();
+        immobileSolids = new LongMap<>();
+        immobileSensors = new LongMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
         solidMovingEntitiesCollisions = new Array<>(false, solidMovingEntities.toArray(Entity.class), 0, solidMovingEntities.size());
         engine.addEntityListener(FAMILY_SOLID_MOVING, new EntityListener() {
@@ -309,7 +309,7 @@ public class BodyMovingSystem extends EntitySystem {
         int endY = chunkEndY(area);
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                int fused = fusedCoordinates(x, y);
+                long fused = fusedCoordinates(x, y);
                 Array<Entity> entities = immobileSensors.get(fused);
                 if (entities == null) continue;
                 for (Entity entity : entities) {
@@ -332,7 +332,7 @@ public class BodyMovingSystem extends EntitySystem {
         int endY = chunkEndY(area);
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                int fused = fusedCoordinates(x, y);
+                long fused = fusedCoordinates(x, y);
                 Array<Entity> entities = immobileSolids.get(fused);
                 if (entities == null) continue;
                 for (Entity entity : entities) {
@@ -381,7 +381,7 @@ public class BodyMovingSystem extends EntitySystem {
         @Override
         public void entityAdded(Entity entity) {
             Transform area = transforms.get(entity).transform;
-            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            LongMap<Array<Entity>> immobileMap = mapFor(entity);
             if (immobileMap == null) {
                 return;
             }
@@ -391,7 +391,7 @@ public class BodyMovingSystem extends EntitySystem {
             int endY = (int) (area.top() / CHUNK_SIZE);
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    int fused = fusedCoordinates(x, y);
+                    long fused = fusedCoordinates(x, y);
                     if (!immobileMap.containsKey(fused)) {
                         immobileMap.put(fused, new Array<>());
                     }
@@ -403,7 +403,7 @@ public class BodyMovingSystem extends EntitySystem {
         @Override
         public void entityRemoved(Entity entity) {
             Transform area = transforms.get(entity).transform;
-            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            LongMap<Array<Entity>> immobileMap = mapFor(entity);
             if (immobileMap == null) {
                 return;
             }
@@ -413,7 +413,7 @@ public class BodyMovingSystem extends EntitySystem {
             int endY = (int) (area.top() / CHUNK_SIZE);
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    int fused = fusedCoordinates(x, y);
+                    long fused = fusedCoordinates(x, y);
                     if (!immobileMap.containsKey(fused)) {
                         continue;
                     }
@@ -423,7 +423,7 @@ public class BodyMovingSystem extends EntitySystem {
         }
 
         @Null
-        private IntMap<Array<Entity>> mapFor(Entity entity) {
+        private LongMap<Array<Entity>> mapFor(Entity entity) {
             if (solidBodies.has(entity)) {
                 return immobileSolids;
             } else if (sensorBodies.has(entity)) {
@@ -434,7 +434,7 @@ public class BodyMovingSystem extends EntitySystem {
         }
     };
 
-    private int fusedCoordinates(int x, int y) {
-        return x << 16 | (y & 0xFFFF);
+    private long fusedCoordinates(int x, int y) {
+        return (long) x << 32 | (y & 0xFFFFFFFFL);
     }
 }
