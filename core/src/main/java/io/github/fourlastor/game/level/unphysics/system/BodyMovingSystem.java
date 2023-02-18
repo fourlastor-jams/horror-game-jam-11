@@ -43,6 +43,7 @@ public class BodyMovingSystem extends EntitySystem {
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
     private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> solidMovingEntities;
+    private Array<Entity> solidMovingEntitiesCollisions;
     private ImmutableArray<Entity> kinematicEntities;
     private IntMap<Array<Entity>> immobileSolids;
     private IntMap<Array<Entity>> immobileSensors;
@@ -70,6 +71,18 @@ public class BodyMovingSystem extends EntitySystem {
         immobileSolids = new IntMap<>();
         immobileSensors = new IntMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
+        solidMovingEntitiesCollisions = new Array<>(false, solidMovingEntities.toArray(Entity.class), 0, solidMovingEntities.size());
+        engine.addEntityListener(FAMILY_SOLID_MOVING, new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+                solidMovingEntitiesCollisions.add(entity);
+            }
+
+            @Override
+            public void entityRemoved(Entity entity) {
+                solidMovingEntitiesCollisions.removeValue(entity, true);
+            }
+        });
         kinematicEntities = engine.getEntitiesFor(FAMILY_KINEMATIC);
     }
 
@@ -79,6 +92,7 @@ public class BodyMovingSystem extends EntitySystem {
         immobileSolids = null;
         immobileSensors = null;
         solidMovingEntities = null;
+        solidMovingEntitiesCollisions = null;
         kinematicEntities = null;
         super.removedFromEngine(engine);
     }
@@ -111,31 +125,31 @@ public class BodyMovingSystem extends EntitySystem {
             if (moveX != 0) {
                 movingBody.xRemainder -= moveX;
                 transform.moveXBy(moveX);
-                checkSolidCollisionsX(solidBody, transform, moveX);
+                checkSolidCollisionsX(transform, moveX);
             }
             if (moveY != 0) {
                 movingBody.yRemainder -= moveY;
                 transform.moveYBy(moveY);
-                checkSolidCollisionsY(solidBody, transform, moveY);
+                checkSolidCollisionsY(transform, moveY);
             }
             // Re-enable collisions for this Solid
             solidBody.canCollide = true;
         }
     }
 
-    public void checkSolidCollisionsX(SolidBodyComponent solidBody, Transform solidTransform, float moveX) {
+    public void checkSolidCollisionsX(Transform solidTransform, float moveX) {
         for (Entity entity : kinematicEntities) {
             KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
             Transform kinematicTransform = transforms.get(entity).transform;
             if (moveX > 0) {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(moveX, 0))) {
                     moveKinematicX(
                             solidTransform.right() - kinematicTransform.left(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
             } else {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(moveX, 0))) {
                     moveKinematicX(
                             solidTransform.left() - kinematicTransform.right(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
@@ -145,13 +159,13 @@ public class BodyMovingSystem extends EntitySystem {
         }
     }
 
-    public void checkSolidCollisionsY(SolidBodyComponent solidBody, Transform solidTransform, float moveY) {
+    public void checkSolidCollisionsY(Transform solidTransform, float moveY) {
         for (Entity entity : kinematicEntities) {
             KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
             MovingBodyComponent movingBody = movingBodies.get(entity);
             Transform kinematicTransform = transforms.get(entity).transform;
             if (moveY > 0) {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(0, moveY))) {
                     moveKinematicY(
                             solidTransform.top() - kinematicTransform.bottom(),
                             kinematicBody,
@@ -161,7 +175,7 @@ public class BodyMovingSystem extends EntitySystem {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             } else {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(0, moveY))) {
                     moveKinematicY(
                             solidTransform.bottom() - kinematicTransform.top(),
                             kinematicBody,
@@ -171,6 +185,27 @@ public class BodyMovingSystem extends EntitySystem {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             }
+        }
+    }
+
+    private final Vector2 pushedTmp = new Vector2();
+    private final Vector2 kinematicCenterTmp = new Vector2();
+
+    private final Vector2 solidCenterTmp = new Vector2();
+
+    private boolean isPushing(Transform solidTransform, Transform kinematicTransform, Vector2 direction) {
+        Rectangle solidArea = solidTransform.area();
+        Rectangle kinematicArea = kinematicTransform.area();
+        if (!solidArea.overlaps(kinematicArea)) {
+            return false;
+        }
+
+        Vector2 solidCenter = solidArea.getCenter(solidCenterTmp);
+        Vector2 bodyDirection = kinematicArea.getCenter(kinematicCenterTmp).sub(solidCenter);
+        if (direction.x != 0) {
+            return Math.abs(bodyDirection.x) > Math.abs(bodyDirection.y) && bodyDirection.x * direction.x > 0;
+        } else {
+            return Math.abs(bodyDirection.y) > Math.abs(bodyDirection.x) && bodyDirection.y * direction.y > 0;
         }
     }
 
@@ -313,7 +348,7 @@ public class BodyMovingSystem extends EntitySystem {
                 }
             }
         }
-        for (Entity entity : solidMovingEntities) {
+        for (Entity entity : solidMovingEntitiesCollisions) {
             if (collides(area, solidBodies.get(entity), transforms.get(entity).transform)) {
                 return true;
             }
@@ -345,7 +380,7 @@ public class BodyMovingSystem extends EntitySystem {
         Rectangle kinematicArea = kinematicTransform.area();
         Rectangle solidArea = solidTransform.area();
         return kinematicArea.overlaps(solidArea)
-                || offsetBy(kinematicArea, 0, 3).overlaps(solidArea);
+                || offsetBy(kinematicArea, 0, -3).overlaps(solidArea);
     }
 
     private final EntityListener chunkMappingListener = new EntityListener() {
