@@ -39,7 +39,7 @@ public class MovingSystem extends IteratingSystem {
         int next = (current + 1) % path.size();
         Vector2 destination = path.get(next);
         float dst = position.dst(destination);
-        if (dst > 0.1f) {
+        if (dst > 1f) {
             velocity.set(destination).sub(position).nor().scl(movingComponent.speed);
             bodies.get(entity).speed.set(velocity);
         } else {
