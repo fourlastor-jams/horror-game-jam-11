@@ -10,7 +10,6 @@ import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
@@ -21,16 +20,17 @@ import io.github.fourlastor.game.level.input.state.FallingFromJump;
 import io.github.fourlastor.game.level.input.state.Idle;
 import io.github.fourlastor.game.level.input.state.Jumping;
 import io.github.fourlastor.game.level.input.state.Running;
+import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class CharacterStateSystem extends IteratingSystem {
 
-    private static final Family FAMILY_REQUEST =
-            Family.all(PlayerRequestComponent.class, BodyComponent.class).get();
+    private static final Family FAMILY_REQUEST = Family.all(PlayerRequestComponent.class, KinematicBodyComponent.class)
+            .get();
     private static final Family FAMILY = Family.all(
                     PlayerComponent.class,
-                    BodyComponent.class,
+                    KinematicBodyComponent.class,
                     ActorComponent.class,
                     InputComponent.class,
                     AnimatedComponent.class)

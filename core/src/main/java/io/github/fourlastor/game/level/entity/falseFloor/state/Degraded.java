@@ -3,15 +3,15 @@ package io.github.fourlastor.game.level.entity.falseFloor.state;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import javax.inject.Inject;
 
 public class Degraded extends FalseFloorState {
 
     @Inject
     public Degraded(
-            ComponentMapper<BodyComponent> bodies,
+            ComponentMapper<SolidBodyComponent> bodies,
             ComponentMapper<ActorComponent> actors,
             ComponentMapper<FalseFloorComponent> inputs) {
         super(bodies, actors, inputs);
