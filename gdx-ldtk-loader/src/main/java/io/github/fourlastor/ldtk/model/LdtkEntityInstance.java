@@ -70,6 +70,15 @@ public class LdtkEntityInstance {
         return height / 2f;
     }
 
+    public final LdtkFieldInstance field(String fieldName) {
+        for (LdtkFieldInstance fieldInstance : fieldInstances) {
+            if (fieldInstance.identifier.equals(fieldName)) {
+                return fieldInstance;
+            }
+        }
+        throw new IndexOutOfBoundsException("Field " + fieldName + " missing");
+    }
+
     /**
      * Entity width in pixels. For non-resizable entities, it will be the same as Entity definition.
      */

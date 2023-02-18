@@ -17,7 +17,6 @@ import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTileRect;
 import io.github.fourlastor.ldtk.model.LdtkTilesetCustomData;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
-import io.github.fourlastor.ldtk.model.MultiAssociatedValue;
 
 @Module
 public interface LdtkModule {
@@ -64,7 +63,4 @@ public interface LdtkModule {
 
     @Binds
     JsonParser<LdtkTilesetDefinition> bindLdtkTilesetDefinition(LdtkTilesetDefinition.Parser parser);
-
-    @Binds
-    JsonParser<MultiAssociatedValue> bindMultiAssociatedValue(MultiAssociatedValue.Parser parser);
 }

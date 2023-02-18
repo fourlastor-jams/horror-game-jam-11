@@ -14,7 +14,7 @@ import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
 import io.github.fourlastor.game.level.component.SpikeComponent;
-import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
@@ -176,7 +176,7 @@ public class EntitiesFactory {
         LdtkLayerInstance entityLayer = entityLayer();
         List<Entity> entities = new ArrayList<>();
         for (LdtkEntityInstance instance : entityLayer.entityInstances) {
-            if ("False_floor".equals(instance.identifier)) {
+            if ("Timed_floor".equals(instance.identifier)) {
                 Entity entity = new Entity();
                 String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
                 Image actor = new Image(atlas.findRegion("entities/" + tileName));
@@ -189,7 +189,9 @@ public class EntitiesFactory {
                 entity.add(new TransformComponent(
                         new Transform(new Rectangle(x, y, instance.width, instance.height * 3f / 16f)
                                 .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
-                entity.add(new FalseFloorComponent.Request());
+                boolean enabled = instance.field("Colliding").booleanValue;
+                float period = instance.field("Period").floatValue;
+                entity.add(new TimedFloorComponent.Request(enabled, period));
                 entities.add(entity);
             }
         }

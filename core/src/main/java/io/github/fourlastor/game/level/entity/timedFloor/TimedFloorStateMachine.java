@@ -1,16 +1,16 @@
-package io.github.fourlastor.game.level.entity.falseFloor;
+package io.github.fourlastor.game.level.entity.timedFloor;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedFactory;
 import dagger.assisted.AssistedInject;
-import io.github.fourlastor.game.level.entity.falseFloor.state.FalseFloorState;
+import io.github.fourlastor.game.level.entity.timedFloor.state.TimedFloorState;
 
-public class FalseFloorStateMachine extends DefaultStateMachine<Entity, FalseFloorState> {
+public class TimedFloorStateMachine extends DefaultStateMachine<Entity, TimedFloorState> {
 
     @AssistedInject
-    public FalseFloorStateMachine(@Assisted Entity entity, @Assisted FalseFloorState initialState) {
+    public TimedFloorStateMachine(@Assisted Entity entity, @Assisted TimedFloorState initialState) {
         super(entity, initialState);
     }
 
@@ -21,6 +21,6 @@ public class FalseFloorStateMachine extends DefaultStateMachine<Entity, FalseFlo
 
     @AssistedFactory
     public interface Factory {
-        FalseFloorStateMachine create(Entity entity, FalseFloorState initialState);
+        TimedFloorStateMachine create(Entity entity, TimedFloorState initialState);
     }
 }

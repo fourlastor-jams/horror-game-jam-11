@@ -13,7 +13,7 @@ import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
 import io.github.fourlastor.game.level.component.SpikeComponent;
-import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
@@ -74,8 +74,8 @@ public class EcsModule {
 
     @Provides
     @ScreenScoped
-    public ComponentMapper<FalseFloorComponent> falseFloorComponent() {
-        return ComponentMapper.getFor(FalseFloorComponent.class);
+    public ComponentMapper<TimedFloorComponent> falseFloorComponent() {
+        return ComponentMapper.getFor(TimedFloorComponent.class);
     }
 
     @Provides
