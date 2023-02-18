@@ -114,21 +114,15 @@ public class BodyMovingSystem extends EntitySystem {
         MovingBodyComponent movingBody = movingBodies.get(entity);
         SolidBodyComponent solidBody = solidBodies.get(entity);
         Transform transform = transforms.get(entity).transform;
-        float x = movingBody.speed.x * delta;
-        float y = movingBody.speed.y * delta;
-        movingBody.xRemainder += x;
-        movingBody.yRemainder += y;
-        int moveX = (int) movingBody.xRemainder;
-        int moveY = (int) movingBody.yRemainder;
+        float moveX = movingBody.speed.x * delta;
+        float moveY = movingBody.speed.y * delta;
         if (moveX != 0 || moveY != 0) {
             solidBody.canCollide = false;
             if (moveX != 0) {
-                movingBody.xRemainder -= moveX;
                 transform.moveXBy(moveX);
                 checkSolidCollisionsX(transform, moveX);
             }
             if (moveY != 0) {
-                movingBody.yRemainder -= moveY;
                 transform.moveYBy(moveY);
                 checkSolidCollisionsY(transform, moveY);
             }
