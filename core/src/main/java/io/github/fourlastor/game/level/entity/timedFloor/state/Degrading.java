@@ -1,14 +1,14 @@
-package io.github.fourlastor.game.level.entity.falseFloor.state;
+package io.github.fourlastor.game.level.entity.timedFloor.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import javax.inject.Inject;
 
-public class Degrading extends FalseFloorState {
+public class Degrading extends TimedFloorState {
 
     private float timer = 0f;
 
@@ -16,7 +16,7 @@ public class Degrading extends FalseFloorState {
     public Degrading(
             ComponentMapper<SolidBodyComponent> bodies,
             ComponentMapper<ActorComponent> actors,
-            ComponentMapper<FalseFloorComponent> inputs) {
+            ComponentMapper<TimedFloorComponent> inputs) {
         super(bodies, actors, inputs);
     }
 
@@ -32,8 +32,8 @@ public class Degrading extends FalseFloorState {
         super.update(entity);
         timer += delta();
         if (timer > 1f) {
-            FalseFloorComponent falseFloorComponent = falseFloors.get(entity);
-            falseFloorComponent.stateMachine.changeState(falseFloorComponent.degraded);
+            TimedFloorComponent timedFloorComponent = falseFloors.get(entity);
+            timedFloorComponent.stateMachine.changeState(timedFloorComponent.degraded);
         }
     }
 }

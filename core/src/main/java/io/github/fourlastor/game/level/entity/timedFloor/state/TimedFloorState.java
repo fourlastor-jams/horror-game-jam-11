@@ -1,25 +1,25 @@
-package io.github.fourlastor.game.level.entity.falseFloor.state;
+package io.github.fourlastor.game.level.entity.timedFloor.state;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorComponent;
+import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 
-public abstract class FalseFloorState implements State<Entity> {
+public abstract class TimedFloorState implements State<Entity> {
 
     protected final ComponentMapper<SolidBodyComponent> bodies;
     protected final ComponentMapper<ActorComponent> actors;
-    protected final ComponentMapper<FalseFloorComponent> falseFloors;
+    protected final ComponentMapper<TimedFloorComponent> falseFloors;
 
     private float delta;
 
-    public FalseFloorState(
+    public TimedFloorState(
             ComponentMapper<SolidBodyComponent> bodies,
             ComponentMapper<ActorComponent> actors,
-            ComponentMapper<FalseFloorComponent> falseFloors) {
+            ComponentMapper<TimedFloorComponent> falseFloors) {
         this.bodies = bodies;
         this.actors = actors;
         this.falseFloors = falseFloors;

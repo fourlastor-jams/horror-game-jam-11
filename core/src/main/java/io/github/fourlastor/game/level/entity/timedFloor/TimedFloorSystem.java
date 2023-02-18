@@ -1,4 +1,4 @@
-package io.github.fourlastor.game.level.entity.falseFloor;
+package io.github.fourlastor.game.level.entity.timedFloor;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -9,9 +9,9 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.entity.falseFloor.state.Degraded;
-import io.github.fourlastor.game.level.entity.falseFloor.state.Degrading;
-import io.github.fourlastor.game.level.entity.falseFloor.state.Intact;
+import io.github.fourlastor.game.level.entity.timedFloor.state.Degraded;
+import io.github.fourlastor.game.level.entity.timedFloor.state.Degrading;
+import io.github.fourlastor.game.level.entity.timedFloor.state.Intact;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -20,23 +20,23 @@ import javax.inject.Provider;
  * Coordinates the movement between each pair of scene2d actor and box2d body.
  * Actors follow the bodies.
  */
-public class FalseFloorSystem extends IteratingSystem {
+public class TimedFloorSystem extends IteratingSystem {
 
     private static final Family FAMILY = Family.all(
-                    SolidBodyComponent.class, ActorComponent.class, FalseFloorComponent.class)
+                    SolidBodyComponent.class, ActorComponent.class, TimedFloorComponent.class)
             .get();
     private static final Family FAMILY_SETUP =
-            Family.all(FalseFloorComponent.Request.class).get();
+            Family.all(TimedFloorComponent.Request.class).get();
     private static final Family FAMILY_REMOVAL =
-            Family.all(FalseFloorComponent.Removal.class).get();
-    private final ComponentMapper<FalseFloorComponent> falseFloors;
+            Family.all(TimedFloorComponent.Removal.class).get();
+    private final ComponentMapper<TimedFloorComponent> falseFloors;
     private final MessageDispatcher messageDispatcher;
     private final SetupListener setupListener;
     private RemovalListener removalListener;
 
     @Inject
-    public FalseFloorSystem(
-            ComponentMapper<FalseFloorComponent> falseFloors,
+    public TimedFloorSystem(
+            ComponentMapper<TimedFloorComponent> falseFloors,
             MessageDispatcher messageDispatcher,
             SetupListener setupListener) {
         super(FAMILY);
@@ -71,7 +71,7 @@ public class FalseFloorSystem extends IteratingSystem {
         private final Provider<Intact> intactFactory;
         private final Provider<Degrading> degradingFactory;
         private final Provider<Degraded> degradedFactory;
-        private final FalseFloorStateMachine.Factory stateMachineFactory;
+        private final TimedFloorStateMachine.Factory stateMachineFactory;
         private final MessageDispatcher messageDispatcher;
 
         @Inject
@@ -79,7 +79,7 @@ public class FalseFloorSystem extends IteratingSystem {
                 Provider<Intact> intactFactory,
                 Provider<Degrading> degradingFactory,
                 Provider<Degraded> degradedFactory,
-                FalseFloorStateMachine.Factory stateMachineFactory,
+                TimedFloorStateMachine.Factory stateMachineFactory,
                 MessageDispatcher messageDispatcher) {
             this.intactFactory = intactFactory;
             this.degradingFactory = degradingFactory;
@@ -90,12 +90,12 @@ public class FalseFloorSystem extends IteratingSystem {
 
         @Override
         public void entityAdded(Entity entity) {
-            entity.remove(FalseFloorComponent.Request.class);
+            entity.remove(TimedFloorComponent.Request.class);
             Intact intact = intactFactory.get();
             Degrading degrading = degradingFactory.get();
             Degraded degraded = degradedFactory.get();
-            FalseFloorStateMachine stateMachine = stateMachineFactory.create(entity, intact);
-            entity.add(new FalseFloorComponent(stateMachine, intact, degrading, degraded));
+            TimedFloorStateMachine stateMachine = stateMachineFactory.create(entity, intact);
+            entity.add(new TimedFloorComponent(stateMachine, intact, degrading, degraded));
             stateMachine.getCurrentState().enter(entity);
             messageDispatcher.addListener(stateMachine, Message.PLAYER_ON_GROUND.ordinal());
         }
@@ -116,8 +116,8 @@ public class FalseFloorSystem extends IteratingSystem {
 
         @Override
         public void entityAdded(Entity entity) {
-            FalseFloorComponent falseFloorComponent = entity.remove(FalseFloorComponent.class);
-            messageDispatcher.removeListener(falseFloorComponent.stateMachine);
+            TimedFloorComponent timedFloorComponent = entity.remove(TimedFloorComponent.class);
+            messageDispatcher.removeListener(timedFloorComponent.stateMachine);
             engine.removeEntity(entity);
         }
 
