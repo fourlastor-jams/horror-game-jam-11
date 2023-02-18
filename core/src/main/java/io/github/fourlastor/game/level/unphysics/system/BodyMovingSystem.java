@@ -392,10 +392,12 @@ public class BodyMovingSystem extends EntitySystem {
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
                     long fused = fusedCoordinates(x, y);
-                    if (!immobileMap.containsKey(fused)) {
-                        immobileMap.put(fused, new Array<>());
+                    Array<Entity> entities = immobileMap.get(fused);
+                    if (entities == null) {
+                        entities = new Array<>();
+                        immobileMap.put(fused, entities);
                     }
-                    immobileMap.get(fused).add(entity);
+                    entities.add(entity);
                 }
             }
         }
@@ -414,10 +416,11 @@ public class BodyMovingSystem extends EntitySystem {
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
                     long fused = fusedCoordinates(x, y);
-                    if (!immobileMap.containsKey(fused)) {
+                    Array<Entity> entities = immobileMap.get(fused);
+                    if (entities == null) {
                         continue;
                     }
-                    immobileMap.get(fused).removeValue(entity, true);
+                    entities.removeValue(entity, true);
                 }
             }
         }
