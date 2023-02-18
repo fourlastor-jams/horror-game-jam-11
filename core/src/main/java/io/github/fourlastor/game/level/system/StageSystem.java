@@ -47,8 +47,7 @@ public class StageSystem extends EntitySystem implements EntityListener {
                     camera.position.x - halfWidth,
                     camera.position.y - halfHeight,
                     camera.viewportWidth,
-                    camera.viewportHeight
-            );
+                    camera.viewportHeight);
             layer.setCullingArea(cullingArea);
         }
         stage.act(deltaTime);

@@ -9,10 +9,10 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import io.github.fourlastor.game.level.Message;
 import io.github.fourlastor.game.level.component.ActorComponent;
-import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Degraded;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Degrading;
 import io.github.fourlastor.game.level.entity.falseFloor.state.Intact;
+import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -23,7 +23,7 @@ import javax.inject.Provider;
 public class FalseFloorSystem extends IteratingSystem {
 
     private static final Family FAMILY = Family.all(
-                    BodyComponent.class, ActorComponent.class, FalseFloorComponent.class)
+                    SolidBodyComponent.class, ActorComponent.class, FalseFloorComponent.class)
             .get();
     private static final Family FAMILY_SETUP =
             Family.all(FalseFloorComponent.Request.class).get();

@@ -131,6 +131,7 @@ dependencies {
     sources(libs.ashley)
     sources(libs.textratypist)
     sources(libs.regexodus)
+    sources(libs.shapedrawer)
 }
 
 fun DependencyHandlerScope.sources(

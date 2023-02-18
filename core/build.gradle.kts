@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.ashley)
     implementation(libs.textratypist)
     implementation(libs.dagger.core)
+    implementation(libs.shapedrawer)
     api(libs.dagger.gwt)
     annotationProcessor(libs.dagger.compiler)
 }

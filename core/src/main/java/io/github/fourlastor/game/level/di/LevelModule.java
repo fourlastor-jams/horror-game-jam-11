@@ -15,14 +15,14 @@ import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.entity.falseFloor.FalseFloorSystem;
 import io.github.fourlastor.game.level.input.CharacterStateSystem;
 import io.github.fourlastor.game.level.input.InputBufferSystem;
-import io.github.fourlastor.game.level.physics.PhysicsDebugSystem;
-import io.github.fourlastor.game.level.physics.PhysicsSystem;
-import io.github.fourlastor.game.level.system.ActorFollowBodySystem;
 import io.github.fourlastor.game.level.system.CameraMovementSystem;
 import io.github.fourlastor.game.level.system.ClearScreenSystem;
-import io.github.fourlastor.game.level.system.MovingSystem;
-import io.github.fourlastor.game.level.system.SoundSystem;
+import io.github.fourlastor.game.level.system.DeathSystem;
 import io.github.fourlastor.game.level.system.StageSystem;
+import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
+import io.github.fourlastor.game.level.unphysics.system.BodyMovingSystem;
+import io.github.fourlastor.game.level.unphysics.system.GravitySystem;
+import io.github.fourlastor.game.level.unphysics.system.TransformDebugSystem;
 
 @Module
 public class LevelModule {
@@ -34,26 +34,26 @@ public class LevelModule {
             CharacterStateSystem characterStateSystem,
             FalseFloorSystem falseFloorSystem,
             CameraMovementSystem cameraMovementSystem,
-            PhysicsSystem physicsSystem,
-            ActorFollowBodySystem actorFollowBodySystem,
             StageSystem stageSystem,
             ClearScreenSystem clearScreenSystem,
+            GravitySystem gravitySystem,
+            BodyMovingSystem bodyMovingSystem,
+            ActorFollowTransformSystem actorFollowTransformSystem,
+            DeathSystem deathSystem,
             @SuppressWarnings("unused") // debug only
-                    PhysicsDebugSystem physicsDebugSystem,
-            MovingSystem movingSystem,
-            SoundSystem soundSystem) {
+                    TransformDebugSystem transformDebugSystem) {
         Engine engine = new Engine();
-        engine.addSystem(movingSystem);
         engine.addSystem(inputBufferSystem);
         engine.addSystem(characterStateSystem);
         engine.addSystem(falseFloorSystem);
-        engine.addSystem(physicsSystem);
-        engine.addSystem(soundSystem);
+        engine.addSystem(bodyMovingSystem);
+        engine.addSystem(gravitySystem);
+        engine.addSystem(deathSystem);
+        engine.addSystem(actorFollowTransformSystem);
         engine.addSystem(cameraMovementSystem);
-        engine.addSystem(actorFollowBodySystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        //        engine.addSystem(physicsDebugSystem);
+        //        engine.addSystem(transformDebugSystem);
         return engine;
     }
 
@@ -90,9 +90,9 @@ public class LevelModule {
     @Provides
     public GameConfig gameConfig() {
         return new GameConfig(
-                new GameConfig.Display(32f, 18f, 1f / 16f),
-                new GameConfig.Physics(new Vector2(0f, -10f)),
-                new GameConfig.Player(6f, 0.15f, 1f, 2.5f, 0.1f, new Vector2(0f, -20f)),
+                new GameConfig.Display(256f, 144f, 1f),
+                new GameConfig.Physics(new Vector2(0f, -216)),
+                new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f),
                 new GameConfig.Entities(0.7f));
     }
 }
