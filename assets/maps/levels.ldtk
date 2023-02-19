@@ -966,7 +966,7 @@
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
-			"pivotY": 0,
+			"pivotY": 1,
 			"fieldDefs": []
 		},
 		{
@@ -1956,8 +1956,8 @@
 					"entityInstances": [
 						{
 							"__identifier": "Ladder",
-							"__grid": [58,45],
-							"__pivot": [0,0],
+							"__grid": [58,51],
+							"__pivot": [0,1],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#3A4466",
@@ -1965,7 +1965,7 @@
 							"width": 16,
 							"height": 112,
 							"defUid": 91,
-							"px": [928,720],
+							"px": [928,832],
 							"fieldInstances": []
 						},
 						{
@@ -2062,8 +2062,8 @@
 						},
 						{
 							"__identifier": "Ladder",
-							"__grid": [60,41],
-							"__pivot": [0,0],
+							"__grid": [60,44],
+							"__pivot": [0,1],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#3A4466",
@@ -2071,13 +2071,13 @@
 							"width": 16,
 							"height": 64,
 							"defUid": 91,
-							"px": [960,656],
+							"px": [960,720],
 							"fieldInstances": []
 						},
 						{
 							"__identifier": "Ladder",
-							"__grid": [63,41],
-							"__pivot": [0,0],
+							"__grid": [63,44],
+							"__pivot": [0,1],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#3A4466",
@@ -2085,7 +2085,7 @@
 							"width": 16,
 							"height": 64,
 							"defUid": 91,
-							"px": [1008,656],
+							"px": [1008,720],
 							"fieldInstances": []
 						},
 						{
@@ -2104,7 +2104,7 @@
 						},
 						{
 							"__identifier": "Player",
-							"__grid": [83,18],
+							"__grid": [52,14],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -2113,7 +2113,7 @@
 							"width": 8,
 							"height": 16,
 							"defUid": 76,
-							"px": [1328,288],
+							"px": [832,224],
 							"fieldInstances": []
 						},
 						{
@@ -2766,8 +2766,8 @@
 						},
 						{
 							"__identifier": "Ladder",
-							"__grid": [48,11],
-							"__pivot": [0,0],
+							"__grid": [48,15],
+							"__pivot": [0,1],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#3A4466",
@@ -2775,7 +2775,7 @@
 							"width": 16,
 							"height": 80,
 							"defUid": 91,
-							"px": [768,176],
+							"px": [768,256],
 							"fieldInstances": []
 						},
 						{
