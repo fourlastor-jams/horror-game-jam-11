@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
@@ -209,8 +210,9 @@ public class EntitiesFactory {
             if (instance.identifier.startsWith("Spike")) {
                 Entity entity = new Entity();
                 String tileName = instance.identifier.toLowerCase(Locale.ROOT).replace('_', '-');
-                Image actor = new Image(atlas.findRegion("entities/" + tileName));
+                Image actor = new Image(new TiledDrawable(atlas.findRegion("entities/" + tileName)));
                 actor.setScale(scale);
+                actor.setSize(instance.width, instance.height);
                 float x = instance.x();
                 float y = instance.y(entityLayer.cHei, entityLayer.gridSize);
                 actor.setPosition(x * scale, y * scale);

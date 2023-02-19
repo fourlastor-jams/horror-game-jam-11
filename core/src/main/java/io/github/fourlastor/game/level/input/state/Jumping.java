@@ -29,7 +29,6 @@ public class Jumping extends HorizontalMovement {
         super.enter(entity);
         MovingBodyComponent movingBodyComponent = moving.get(entity);
         movingBodyComponent.speed.y = config.player.jumpSpeed;
-        System.out.println(config.player.jumpSpeed);
         initialY = transforms.get(entity).transform.bottom();
     }
 
@@ -46,7 +45,6 @@ public class Jumping extends HorizontalMovement {
             movingComponent.speed.y = movingComponent.speed.y / 1.7f;
         }
         if (movingComponent.speed.y <= 0f) {
-            System.out.println("fall" + movingComponent.speed.y);
             PlayerComponent playerComponent = players.get(entity);
             playerComponent.stateMachine.changeState(playerComponent.fallingFromJump);
         }
