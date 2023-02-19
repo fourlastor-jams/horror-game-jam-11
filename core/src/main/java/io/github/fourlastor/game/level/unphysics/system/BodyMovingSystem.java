@@ -10,7 +10,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.LongMap;
 import com.badlogic.gdx.utils.Null;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
@@ -43,9 +43,10 @@ public class BodyMovingSystem extends EntitySystem {
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
     private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> solidMovingEntities;
+    private Array<Entity> solidMovingEntitiesCollisions;
     private ImmutableArray<Entity> kinematicEntities;
-    private IntMap<Array<Entity>> immobileSolids;
-    private IntMap<Array<Entity>> immobileSensors;
+    private LongMap<Array<Entity>> immobileSolids;
+    private LongMap<Array<Entity>> immobileSensors;
 
     @Inject
     public BodyMovingSystem(
@@ -67,9 +68,22 @@ public class BodyMovingSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         engine.addEntityListener(FAMILY_IMMOBILE, chunkMappingListener);
-        immobileSolids = new IntMap<>();
-        immobileSensors = new IntMap<>();
+        immobileSolids = new LongMap<>();
+        immobileSensors = new LongMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
+        solidMovingEntitiesCollisions =
+                new Array<>(false, solidMovingEntities.toArray(Entity.class), 0, solidMovingEntities.size());
+        engine.addEntityListener(FAMILY_SOLID_MOVING, new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+                solidMovingEntitiesCollisions.add(entity);
+            }
+
+            @Override
+            public void entityRemoved(Entity entity) {
+                solidMovingEntitiesCollisions.removeValue(entity, true);
+            }
+        });
         kinematicEntities = engine.getEntitiesFor(FAMILY_KINEMATIC);
     }
 
@@ -79,6 +93,7 @@ public class BodyMovingSystem extends EntitySystem {
         immobileSolids = null;
         immobileSensors = null;
         solidMovingEntities = null;
+        solidMovingEntitiesCollisions = null;
         kinematicEntities = null;
         super.removedFromEngine(engine);
     }
@@ -100,42 +115,36 @@ public class BodyMovingSystem extends EntitySystem {
         MovingBodyComponent movingBody = movingBodies.get(entity);
         SolidBodyComponent solidBody = solidBodies.get(entity);
         Transform transform = transforms.get(entity).transform;
-        float x = movingBody.speed.x * delta;
-        float y = movingBody.speed.y * delta;
-        movingBody.xRemainder += x;
-        movingBody.yRemainder += y;
-        int moveX = (int) movingBody.xRemainder;
-        int moveY = (int) movingBody.yRemainder;
+        float moveX = movingBody.speed.x * delta;
+        float moveY = movingBody.speed.y * delta;
         if (moveX != 0 || moveY != 0) {
             solidBody.canCollide = false;
             if (moveX != 0) {
-                movingBody.xRemainder -= moveX;
                 transform.moveXBy(moveX);
-                checkSolidCollisionsX(solidBody, transform, moveX);
+                checkSolidCollisionsX(transform, moveX);
             }
             if (moveY != 0) {
-                movingBody.yRemainder -= moveY;
                 transform.moveYBy(moveY);
-                checkSolidCollisionsY(solidBody, transform, moveY);
+                checkSolidCollisionsY(transform, moveY);
             }
             // Re-enable collisions for this Solid
             solidBody.canCollide = true;
         }
     }
 
-    public void checkSolidCollisionsX(SolidBodyComponent solidBody, Transform solidTransform, float moveX) {
+    public void checkSolidCollisionsX(Transform solidTransform, float moveX) {
         for (Entity entity : kinematicEntities) {
             KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
             Transform kinematicTransform = transforms.get(entity).transform;
             if (moveX > 0) {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(moveX, 0))) {
                     moveKinematicX(
                             solidTransform.right() - kinematicTransform.left(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
                     moveKinematicX(moveX, kinematicBody, kinematicTransform);
                 }
             } else {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(moveX, 0))) {
                     moveKinematicX(
                             solidTransform.left() - kinematicTransform.right(), kinematicBody, kinematicTransform);
                 } else if (isRiding(kinematicTransform, solidTransform)) {
@@ -145,13 +154,13 @@ public class BodyMovingSystem extends EntitySystem {
         }
     }
 
-    public void checkSolidCollisionsY(SolidBodyComponent solidBody, Transform solidTransform, float moveY) {
+    public void checkSolidCollisionsY(Transform solidTransform, float moveY) {
         for (Entity entity : kinematicEntities) {
             KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
             MovingBodyComponent movingBody = movingBodies.get(entity);
             Transform kinematicTransform = transforms.get(entity).transform;
             if (moveY > 0) {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(0, moveY))) {
                     moveKinematicY(
                             solidTransform.top() - kinematicTransform.bottom(),
                             kinematicBody,
@@ -161,7 +170,7 @@ public class BodyMovingSystem extends EntitySystem {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             } else {
-                if (collides(kinematicTransform.area(), solidBody, solidTransform)) {
+                if (isPushing(solidTransform, kinematicTransform, pushedTmp.set(0, moveY))) {
                     moveKinematicY(
                             solidTransform.bottom() - kinematicTransform.top(),
                             kinematicBody,
@@ -171,6 +180,27 @@ public class BodyMovingSystem extends EntitySystem {
                     moveKinematicY(moveY, kinematicBody, movingBody, kinematicTransform);
                 }
             }
+        }
+    }
+
+    private final Vector2 pushedTmp = new Vector2();
+    private final Vector2 kinematicCenterTmp = new Vector2();
+
+    private final Vector2 solidCenterTmp = new Vector2();
+
+    private boolean isPushing(Transform solidTransform, Transform kinematicTransform, Vector2 direction) {
+        Rectangle solidArea = solidTransform.area();
+        Rectangle kinematicArea = kinematicTransform.area();
+        if (!solidArea.overlaps(kinematicArea)) {
+            return false;
+        }
+
+        Vector2 solidCenter = solidArea.getCenter(solidCenterTmp);
+        Vector2 bodyDirection = kinematicArea.getCenter(kinematicCenterTmp).sub(solidCenter);
+        if (direction.x != 0) {
+            return Math.abs(bodyDirection.x) > Math.abs(bodyDirection.y) && bodyDirection.x * direction.x > 0;
+        } else {
+            return Math.abs(bodyDirection.y) > Math.abs(bodyDirection.x) && bodyDirection.y * direction.y > 0;
         }
     }
 
@@ -280,7 +310,7 @@ public class BodyMovingSystem extends EntitySystem {
         int endY = chunkEndY(area);
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                int fused = fusedCoordinates(x, y);
+                long fused = fusedCoordinates(x, y);
                 Array<Entity> entities = immobileSensors.get(fused);
                 if (entities == null) continue;
                 for (Entity entity : entities) {
@@ -303,7 +333,7 @@ public class BodyMovingSystem extends EntitySystem {
         int endY = chunkEndY(area);
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                int fused = fusedCoordinates(x, y);
+                long fused = fusedCoordinates(x, y);
                 Array<Entity> entities = immobileSolids.get(fused);
                 if (entities == null) continue;
                 for (Entity entity : entities) {
@@ -313,7 +343,7 @@ public class BodyMovingSystem extends EntitySystem {
                 }
             }
         }
-        for (Entity entity : solidMovingEntities) {
+        for (Entity entity : solidMovingEntitiesCollisions) {
             if (collides(area, solidBodies.get(entity), transforms.get(entity).transform)) {
                 return true;
             }
@@ -345,14 +375,14 @@ public class BodyMovingSystem extends EntitySystem {
         Rectangle kinematicArea = kinematicTransform.area();
         Rectangle solidArea = solidTransform.area();
         return kinematicArea.overlaps(solidArea)
-                || offsetBy(kinematicArea, 0, 3).overlaps(solidArea);
+                || offsetBy(kinematicArea, 0, -3).overlaps(solidArea);
     }
 
     private final EntityListener chunkMappingListener = new EntityListener() {
         @Override
         public void entityAdded(Entity entity) {
             Transform area = transforms.get(entity).transform;
-            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            LongMap<Array<Entity>> immobileMap = mapFor(entity);
             if (immobileMap == null) {
                 return;
             }
@@ -362,11 +392,13 @@ public class BodyMovingSystem extends EntitySystem {
             int endY = (int) (area.top() / CHUNK_SIZE);
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    int fused = fusedCoordinates(x, y);
-                    if (!immobileMap.containsKey(fused)) {
-                        immobileMap.put(fused, new Array<>());
+                    long fused = fusedCoordinates(x, y);
+                    Array<Entity> entities = immobileMap.get(fused);
+                    if (entities == null) {
+                        entities = new Array<>();
+                        immobileMap.put(fused, entities);
                     }
-                    immobileMap.get(fused).add(entity);
+                    entities.add(entity);
                 }
             }
         }
@@ -374,7 +406,7 @@ public class BodyMovingSystem extends EntitySystem {
         @Override
         public void entityRemoved(Entity entity) {
             Transform area = transforms.get(entity).transform;
-            IntMap<Array<Entity>> immobileMap = mapFor(entity);
+            LongMap<Array<Entity>> immobileMap = mapFor(entity);
             if (immobileMap == null) {
                 return;
             }
@@ -384,17 +416,18 @@ public class BodyMovingSystem extends EntitySystem {
             int endY = (int) (area.top() / CHUNK_SIZE);
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
-                    int fused = fusedCoordinates(x, y);
-                    if (!immobileMap.containsKey(fused)) {
+                    long fused = fusedCoordinates(x, y);
+                    Array<Entity> entities = immobileMap.get(fused);
+                    if (entities == null) {
                         continue;
                     }
-                    immobileMap.get(fused).removeValue(entity, true);
+                    entities.removeValue(entity, true);
                 }
             }
         }
 
         @Null
-        private IntMap<Array<Entity>> mapFor(Entity entity) {
+        private LongMap<Array<Entity>> mapFor(Entity entity) {
             if (solidBodies.has(entity)) {
                 return immobileSolids;
             } else if (sensorBodies.has(entity)) {
@@ -405,7 +438,7 @@ public class BodyMovingSystem extends EntitySystem {
         }
     };
 
-    private int fusedCoordinates(int x, int y) {
-        return x << 16 | (y & 0xFFFF);
+    private long fusedCoordinates(int x, int y) {
+        return (long) x << 32 | (y & 0xFFFFFFFFL);
     }
 }

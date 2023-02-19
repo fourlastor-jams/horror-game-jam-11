@@ -12,6 +12,7 @@ import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
+import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
 import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
@@ -192,6 +193,38 @@ public class EntitiesFactory {
                 boolean enabled = instance.field("Colliding").booleanValue;
                 float period = instance.field("Period").floatValue;
                 entity.add(new TimedFloorComponent.Request(enabled, period));
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public List<Entity> movingFloors() {
+        ArrayList<Entity> entities = new ArrayList<>();
+        LdtkLayerInstance entityLayer = entityLayer();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if ("Moving_floor".equals(instance.identifier)) {
+                Entity entity = new Entity();
+                Image image = new Image(atlas.findRegion("whitePixel"));
+                image.setSize(instance.width, instance.height);
+                entity.add(new FollowBodyComponent());
+                entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
+                entity.add(new TransformComponent(new Transform(new Rectangle(
+                        instance.x(),
+                        instance.y(entityLayer.cHei, entityLayer.gridSize),
+                        instance.width,
+                        instance.height))));
+                entity.add(new MovingBodyComponent());
+                entity.add(new SolidBodyComponent());
+
+                float speed = instance.field("Speed").floatValue;
+                List<Vector2> arrayValue = instance.field("Path").vectorArrayValue;
+                List<Vector2> path = new ArrayList<>(arrayValue.size());
+                for (Vector2 vector2 : arrayValue) {
+                    float y = (entityLayer.cHei - 1) - vector2.y;
+                    path.add(new Vector2(vector2.x, y).scl(entityLayer.gridSize));
+                }
+                entity.add(new MovingComponent(path, speed * entityLayer.gridSize));
                 entities.add(entity);
             }
         }
