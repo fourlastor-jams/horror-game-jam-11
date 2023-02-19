@@ -71,7 +71,7 @@ public class LevelScreen extends ScreenAdapter {
         @Override
         public boolean keyDown(int keycode) {
             if (keycode == Input.Keys.R) {
-                router.goToLevel(0);
+                router.goToLevel(1);
                 return true;
             }
             return super.keyDown(keycode);
