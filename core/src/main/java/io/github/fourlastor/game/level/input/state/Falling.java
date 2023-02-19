@@ -1,15 +1,8 @@
 package io.github.fourlastor.game.level.input.state;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import io.github.fourlastor.game.level.GameConfig;
-import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
-import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
-import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
-import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 
 abstract class Falling extends HorizontalMovement {
 
@@ -18,15 +11,8 @@ abstract class Falling extends HorizontalMovement {
     private float fallingTime = 0f;
     private float attemptedTime = -1;
 
-    public Falling(
-            ComponentMapper<PlayerComponent> players,
-            ComponentMapper<KinematicBodyComponent> bodies,
-            ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs,
-            ComponentMapper<MovingBodyComponent> moving,
-            ComponentMapper<TransformComponent> transforms,
-            GameConfig config) {
-        super(players, bodies, animated, inputs, moving, transforms, config);
+    public Falling(StateMappers mappers, GameConfig config) {
+        super(mappers, config);
         this.config = config;
     }
 
@@ -44,12 +30,12 @@ abstract class Falling extends HorizontalMovement {
         super.enter(entity);
         fallingTime = 0f;
         attemptedTime = -1f;
-        entity.getComponent(GravityComponent.class).gravity.scl(config.player.fallingGravityRatio);
+        gravities.get(entity).gravity.scl(config.player.fallingGravityRatio);
     }
 
     @Override
     public void exit(Entity entity) {
-        entity.getComponent(GravityComponent.class).gravity.scl(1 / config.player.fallingGravityRatio);
+        gravities.get(entity).gravity.scl(1 / config.player.fallingGravityRatio);
         super.exit(entity);
     }
 

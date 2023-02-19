@@ -31,6 +31,8 @@ public class InputBufferSystem extends IteratingSystem {
         Control jump = controls.jump();
         Control left = controls.left();
         Control right = controls.right();
+        Control up = controls.up();
+        Control down = controls.down();
         InputComponent input = inputs.get(entity);
         boolean jumpPressed = jump.pressed();
         boolean leftPressed = left.pressed();
@@ -45,5 +47,7 @@ public class InputBufferSystem extends IteratingSystem {
         input.movementChanged = leftJustPressed || rightJustPressed || movementReleased;
         input.leftPressed = leftPressed;
         input.rightPressed = rightPressed;
+        input.upPressed = up.pressed();
+        input.downPressed = down.pressed();
     }
 }

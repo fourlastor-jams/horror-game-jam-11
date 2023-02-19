@@ -45,6 +45,7 @@ public class GameConfig {
         public final float jumpSpeed;
         public final float fallingGraceTime;
         public final float fallingGravityRatio;
+        public final float ladderSpeed;
 
         public Player(
                 float movementSpeed,
@@ -53,7 +54,8 @@ public class GameConfig {
                 float maxJumpHeight,
                 float jumpSpeed,
                 float fallingGraceTime,
-                float fallingGravityRatio) {
+                float fallingGravityRatio,
+                float ladderSpeed) {
             this.movementSpeed = movementSpeed;
             this.accelerationTime = accelerationTime;
             this.minJumpHeight = minJumpHeight;
@@ -61,6 +63,7 @@ public class GameConfig {
             this.jumpSpeed = jumpSpeed;
             this.fallingGraceTime = fallingGraceTime;
             this.fallingGravityRatio = fallingGravityRatio;
+            this.ladderSpeed = ladderSpeed;
         }
     }
 

@@ -4,10 +4,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import io.github.fourlastor.game.level.Message;
+import io.github.fourlastor.game.level.Area;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
+import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
@@ -20,22 +21,18 @@ public abstract class CharacterState implements State<Entity> {
     protected final ComponentMapper<TransformComponent> transforms;
     protected final ComponentMapper<AnimatedComponent> animated;
     protected final ComponentMapper<InputComponent> inputs;
+    protected final ComponentMapper<GravityComponent> gravities;
 
     private float delta;
 
-    public CharacterState(
-            ComponentMapper<PlayerComponent> players,
-            ComponentMapper<KinematicBodyComponent> bodies,
-            ComponentMapper<MovingBodyComponent> moving,
-            ComponentMapper<TransformComponent> transforms,
-            ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs) {
-        this.players = players;
-        this.bodies = bodies;
-        this.moving = moving;
-        this.transforms = transforms;
-        this.animated = animated;
-        this.inputs = inputs;
+    public CharacterState(StateMappers mappers) {
+        this.players = mappers.players;
+        this.bodies = mappers.bodies;
+        this.moving = mappers.moving;
+        this.transforms = mappers.transforms;
+        this.animated = mappers.animated;
+        this.inputs = mappers.inputs;
+        gravities = mappers.gravity;
     }
 
     protected abstract String animation();
@@ -57,12 +54,15 @@ public abstract class CharacterState implements State<Entity> {
     public void exit(Entity entity) {}
 
     @Override
-    public boolean onMessage(Entity entity, Telegram telegram) {
-        if (telegram.message == Message.PLAYER_ON_SPIKE.ordinal()) {
-            PlayerComponent playerComponent = players.get(entity);
-            playerComponent.stateMachine.changeState(playerComponent.dead);
-            return true;
+    public void update(Entity entity) {
+        PlayerComponent player = players.get(entity);
+        if (player.area == Area.SPIKES) {
+            player.stateMachine.changeState(player.dead);
         }
+    }
+
+    @Override
+    public boolean onMessage(Entity entity, Telegram telegram) {
         return false;
     }
 }

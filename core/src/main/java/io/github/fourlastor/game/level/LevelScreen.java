@@ -57,6 +57,9 @@ public class LevelScreen extends ScreenAdapter {
         for (Entity tile : factory.movingFloors()) {
             engine.addEntity(tile);
         }
+        for (Entity tile : factory.ladders()) {
+            engine.addEntity(tile);
+        }
         engine.addEntity(factory.character());
         input.addProcessor(restartOnR);
     }
@@ -71,7 +74,7 @@ public class LevelScreen extends ScreenAdapter {
         @Override
         public boolean keyDown(int keycode) {
             if (keycode == Input.Keys.R) {
-                router.goToLevel(0);
+                router.goToLevel(1);
                 return true;
             }
             return super.keyDown(keycode);

@@ -2,19 +2,22 @@ package io.github.fourlastor.game.level;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
+import io.github.fourlastor.game.level.component.AreaComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
-import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.unphysics.Transform;
@@ -48,6 +51,7 @@ public class EntitiesFactory {
 
     private static final int TILE_SIZE = 16;
     private static final Comparator<Rectangle> RECTANGLE_COMPARATOR = (a, b) -> (int) (a.y - b.y);
+    private static final Color LADDER_COLOR = new Color(0x3c5e8b);
     private final AssetManager assetManager;
     private final TextureAtlas atlas;
     private final LdtkDefinitions definitions;
@@ -215,7 +219,7 @@ public class EntitiesFactory {
                 entity.add(
                         new TransformComponent(new Transform(new Rectangle(x, y, instance.width / 2f, instance.height)
                                 .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
-                entity.add(new SpikeComponent());
+                entity.add(new AreaComponent(Area.SPIKES));
                 entities.add(entity);
             }
         }
@@ -275,6 +279,31 @@ public class EntitiesFactory {
                     path.add(new Vector2(vector2.x, y).scl(entityLayer.gridSize));
                 }
                 entity.add(new MovingComponent(path, speed * entityLayer.gridSize));
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public List<Entity> ladders() {
+        ArrayList<Entity> entities = new ArrayList<>();
+        LdtkLayerInstance entityLayer = entityLayer();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if ("Ladder".equals(instance.identifier)) {
+                Entity entity = new Entity();
+                Drawable bluePixel = new TextureRegionDrawable(atlas.findRegion("whitePixel")).tint(LADDER_COLOR);
+                Image image = new Image(bluePixel);
+                image.setSize(instance.width, instance.height);
+                entity.add(new FollowBodyComponent());
+                entity.add(new SensorBodyComponent());
+                entity.add(new AreaComponent(Area.LADDER));
+                entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
+                entity.add(new TransformComponent(new Transform(new Rectangle(
+                        instance.x(),
+                        instance.y(entityLayer.cHei, entityLayer.gridSize) + TILE_SIZE,
+                        instance.width,
+                        instance.height))));
+
                 entities.add(entity);
             }
         }

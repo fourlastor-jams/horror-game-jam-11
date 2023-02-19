@@ -15,9 +15,9 @@ import io.github.fourlastor.game.level.GameConfig;
 import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorSystem;
 import io.github.fourlastor.game.level.input.CharacterStateSystem;
 import io.github.fourlastor.game.level.input.InputBufferSystem;
+import io.github.fourlastor.game.level.system.AreaSystem;
 import io.github.fourlastor.game.level.system.CameraMovementSystem;
 import io.github.fourlastor.game.level.system.ClearScreenSystem;
-import io.github.fourlastor.game.level.system.DeathSystem;
 import io.github.fourlastor.game.level.system.MovingSystem;
 import io.github.fourlastor.game.level.system.StageSystem;
 import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
@@ -41,7 +41,7 @@ public class LevelModule {
             GravitySystem gravitySystem,
             MovingSystem movingSystem,
             ActorFollowTransformSystem actorFollowTransformSystem,
-            DeathSystem deathSystem,
+            AreaSystem areaSystem,
             @SuppressWarnings("unused") // debug only
                     TransformDebugSystem transformDebugSystem) {
         Engine engine = new Engine();
@@ -51,12 +51,12 @@ public class LevelModule {
         engine.addSystem(bodyMovingSystem);
         engine.addSystem(gravitySystem);
         engine.addSystem(movingSystem);
-        engine.addSystem(deathSystem);
+        engine.addSystem(areaSystem);
         engine.addSystem(actorFollowTransformSystem);
         engine.addSystem(cameraMovementSystem);
         engine.addSystem(clearScreenSystem);
         engine.addSystem(stageSystem);
-        //        engine.addSystem(transformDebugSystem);
+        engine.addSystem(transformDebugSystem);
         return engine;
     }
 
@@ -95,7 +95,7 @@ public class LevelModule {
         return new GameConfig(
                 new GameConfig.Display(256f, 144f, 1f),
                 new GameConfig.Physics(new Vector2(0f, -216)),
-                new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f),
+                new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f, 24f),
                 new GameConfig.Entities(0.7f));
     }
 }
