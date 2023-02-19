@@ -8,18 +8,21 @@ public interface Controls {
     Control right();
 
     Control jump();
+    Control up();
 
     enum Setup implements Controls {
-        P1(Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.SPACE);
+        P1(Input.Keys.LEFT, Input.Keys.RIGHT, Input.Keys.SPACE, Input.Keys.UP);
 
         private final KeysControl left;
         private final KeysControl right;
         private final KeysControl jump;
+        private final KeysControl up;
 
-        Setup(int leftKey, int rightKey, int attackKey) {
+        Setup(int leftKey, int rightKey, int attackKey, int upKey) {
             left = new KeysControl(leftKey);
             right = new KeysControl(rightKey);
             jump = new KeysControl(attackKey);
+            up = new KeysControl(upKey);
         }
 
         @Override
@@ -35,6 +38,11 @@ public interface Controls {
         @Override
         public Control jump() {
             return jump;
+        }
+
+        @Override
+        public Control up() {
+            return up;
         }
     }
 }
