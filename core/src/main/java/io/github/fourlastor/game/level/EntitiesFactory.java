@@ -97,11 +97,12 @@ public class EntitiesFactory {
                 entities.add(entity);
             }
             ArrayList<Rectangle> rectangles = new ArrayList<>();
-            for (int x = 0; x < layerInstance.cWid; x++) {
+            for (int x = -1; x <= layerInstance.cWid; x++) {
                 int startY = -1;
                 int endY = -1;
-                for (int y = 0; y < layerInstance.cHei; y++) {
-                    if (tiles[x][y]) {
+                for (int y = -1; y <= layerInstance.cHei; y++) {
+                    boolean inBounds = x >= 0 && x < layerInstance.cWid && y >= 0 && y < layerInstance.cHei;
+                    if (inBounds && tiles[x][y]) {
                         if (startY < 0) {
                             startY = y;
                         }
