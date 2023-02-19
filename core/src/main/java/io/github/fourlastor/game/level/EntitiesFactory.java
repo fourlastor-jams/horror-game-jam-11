@@ -34,6 +34,7 @@ import io.github.fourlastor.ldtk.model.LdtkTileInstance;
 import io.github.fourlastor.ldtk.model.LdtkTilesetDefinition;
 import io.github.fourlastor.ldtk.scene2d.LdtkMapParser;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
@@ -45,6 +46,8 @@ import javax.inject.Inject;
 @SuppressWarnings("DataFlowIssue")
 public class EntitiesFactory {
 
+    private static final int TILE_SIZE = 16;
+    private static final Comparator<Rectangle> RECTANGLE_COMPARATOR = (a, b) -> (int) (a.y - b.y);
     private final AssetManager assetManager;
     private final TextureAtlas atlas;
     private final LdtkDefinitions definitions;
@@ -77,25 +80,72 @@ public class EntitiesFactory {
         LdtkMapParser parser = new LdtkMapParser(atlas, "tiles", scale);
         List<Entity> entities = new ArrayList<>();
 
-        final float tileSize = 16f * scale;
-
         List<LdtkLayerInstance> layerInstances =
                 definition.layerInstances == null ? new ArrayList<>() : definition.layerInstances;
         for (LdtkLayerInstance layerInstance : layerInstances) {
+            boolean[][] tiles = new boolean[layerInstance.cWid][layerInstance.cHei];
             if (!"AutoLayer".equals(layerInstance.type)) {
                 continue;
             }
             LdtkTilesetDefinition tileset = definitions.tileset(layerInstance.tilesetDefUid);
             for (LdtkTileInstance tileInstance : layerInstance.autoLayerTiles) {
+                tiles[tileInstance.x() / TILE_SIZE][
+                        tileInstance.y(layerInstance.cHei, layerInstance.gridSize) / TILE_SIZE] = true;
                 Image tile = parser.tile(layerInstance, tileset, tileInstance);
                 Entity entity = new Entity();
                 entity.add(new ActorComponent(tile, ActorComponent.Layer.BG_PARALLAX));
+                entities.add(entity);
+            }
+            ArrayList<Rectangle> rectangles = new ArrayList<>();
+            for (int x = -1; x <= layerInstance.cWid; x++) {
+                int startY = -1;
+                int endY = -1;
+                for (int y = -1; y <= layerInstance.cHei; y++) {
+                    boolean inBounds = x >= 0 && x < layerInstance.cWid && y >= 0 && y < layerInstance.cHei;
+                    if (inBounds && tiles[x][y]) {
+                        if (startY < 0) {
+                            startY = y;
+                        }
+                        endY = y;
+                    } else if (startY >= 0) {
+                        ArrayList<Rectangle> overlaps = new ArrayList<>();
+                        for (Rectangle r : rectangles) {
+                            if (r.width == x - 1 && startY <= r.y && endY >= r.height) {
+                                overlaps.add(r);
+                            }
+                        }
+                        overlaps.sort(RECTANGLE_COMPARATOR);
+                        for (Rectangle r : overlaps) {
+                            if (startY < r.y) {
+                                rectangles.add(new Rectangle(x, startY, x, r.y - 1));
+                                startY = (int) r.y;
+                            }
+                            if (startY == r.y) {
+                                r.width += 1;
+                                if (endY == r.height) {
+                                    startY = -1;
+                                    endY = -1;
+                                } else if (endY > r.height) {
+                                    startY = (int) (r.height + 1);
+                                }
+                            }
+                        }
+                        if (startY >= 0) {
+                            rectangles.add(new Rectangle(x, startY, x, endY));
+                            startY = -1;
+                            endY = -1;
+                        }
+                    }
+                }
+            }
+            for (Rectangle rectangle : rectangles) {
+                Entity entity = new Entity();
                 entity.add(new SolidBodyComponent());
-                entity.add(new TransformComponent(new Transform(new Rectangle(
-                        tileInstance.x(),
-                        tileInstance.y(layerInstance.cHei, layerInstance.gridSize),
-                        tileSize,
-                        tileSize))));
+                float width = rectangle.width - rectangle.x + 1;
+                float height = rectangle.height - rectangle.y + 1;
+                Rectangle area = new Rectangle(
+                        rectangle.x * TILE_SIZE, rectangle.y * TILE_SIZE, width * TILE_SIZE, height * TILE_SIZE);
+                entity.add(new TransformComponent(new Transform(area)));
                 entities.add(entity);
             }
         }
