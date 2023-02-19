@@ -30,6 +30,7 @@ public abstract class HorizontalMovement extends CharacterState {
 
     @Override
     public void update(Entity entity) {
+        super.update(entity);
         InputComponent input = inputs.get(entity);
         PlayerComponent playerComponent = players.get(entity);
         if (input.movementChanged) {

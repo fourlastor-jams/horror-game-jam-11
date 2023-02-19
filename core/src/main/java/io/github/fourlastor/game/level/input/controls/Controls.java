@@ -8,6 +8,7 @@ public interface Controls {
     Control right();
 
     Control jump();
+
     Control up();
 
     enum Setup implements Controls {

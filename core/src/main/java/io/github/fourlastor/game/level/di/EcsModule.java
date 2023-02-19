@@ -6,13 +6,13 @@ import dagger.Provides;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
+import io.github.fourlastor.game.level.component.AreaComponent;
 import io.github.fourlastor.game.level.component.BodyBuilderComponent;
 import io.github.fourlastor.game.level.component.BodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.component.SoundComponent;
-import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
@@ -116,7 +116,7 @@ public class EcsModule {
 
     @Provides
     @ScreenScoped
-    public ComponentMapper<SpikeComponent> spikeComponent() {
-        return ComponentMapper.getFor(SpikeComponent.class);
+    public ComponentMapper<AreaComponent> spikeComponent() {
+        return ComponentMapper.getFor(AreaComponent.class);
     }
 }

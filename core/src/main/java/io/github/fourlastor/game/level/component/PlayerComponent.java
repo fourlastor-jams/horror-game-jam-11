@@ -1,6 +1,7 @@
 package io.github.fourlastor.game.level.component;
 
 import com.badlogic.ashley.core.Component;
+import io.github.fourlastor.game.level.Area;
 import io.github.fourlastor.game.level.input.CharacterStateMachine;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.input.state.Dead;
@@ -25,6 +26,7 @@ public class PlayerComponent implements Component {
     public final Dead dead;
 
     public float movementTime = 0;
+    public Area area = Area.NONE;
 
     public PlayerComponent(
             Controls controls,

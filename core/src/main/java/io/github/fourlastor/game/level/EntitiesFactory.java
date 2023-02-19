@@ -13,11 +13,11 @@ import com.badlogic.gdx.utils.Align;
 import io.github.fourlastor.game.di.ScreenScoped;
 import io.github.fourlastor.game.level.component.ActorComponent;
 import io.github.fourlastor.game.level.component.AnimatedComponent;
+import io.github.fourlastor.game.level.component.AreaComponent;
 import io.github.fourlastor.game.level.component.FollowBodyComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.component.PlayerRequestComponent;
-import io.github.fourlastor.game.level.component.SpikeComponent;
 import io.github.fourlastor.game.level.entity.timedFloor.TimedFloorComponent;
 import io.github.fourlastor.game.level.input.controls.Controls;
 import io.github.fourlastor.game.level.unphysics.Transform;
@@ -219,7 +219,7 @@ public class EntitiesFactory {
                 entity.add(
                         new TransformComponent(new Transform(new Rectangle(x, y, instance.width / 2f, instance.height)
                                 .setCenter(x + instance.width / 2f, y + instance.height / 2f))));
-                entity.add(new SpikeComponent());
+                entity.add(new AreaComponent(Area.SPIKES));
                 entities.add(entity);
             }
         }
@@ -296,6 +296,7 @@ public class EntitiesFactory {
                 image.setSize(instance.width, instance.height);
                 entity.add(new FollowBodyComponent());
                 entity.add(new SensorBodyComponent());
+                entity.add(new AreaComponent(Area.LADDER));
                 entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
                 entity.add(new TransformComponent(new Transform(new Rectangle(
                         instance.x(),
