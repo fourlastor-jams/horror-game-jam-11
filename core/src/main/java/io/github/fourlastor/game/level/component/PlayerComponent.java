@@ -9,6 +9,7 @@ import io.github.fourlastor.game.level.input.state.FallingFromGround;
 import io.github.fourlastor.game.level.input.state.FallingFromJump;
 import io.github.fourlastor.game.level.input.state.Idle;
 import io.github.fourlastor.game.level.input.state.Jumping;
+import io.github.fourlastor.game.level.input.state.OnLadder;
 import io.github.fourlastor.game.level.input.state.Running;
 
 /**
@@ -24,6 +25,7 @@ public class PlayerComponent implements Component {
     public final FallingFromJump fallingFromJump;
     public final FallingFromGround fallingFromGround;
     public final Dead dead;
+    public final OnLadder onLadder;
 
     public float movementTime = 0;
     public Area area = Area.NONE;
@@ -36,7 +38,8 @@ public class PlayerComponent implements Component {
             Jumping jumping,
             FallingFromJump fallingFromJump,
             FallingFromGround fallingFromGround,
-            Dead dead) {
+            Dead dead,
+            OnLadder onLadder) {
         this.controls = controls;
         this.stateMachine = stateMachine;
         this.idle = idle;
@@ -45,5 +48,6 @@ public class PlayerComponent implements Component {
         this.fallingFromJump = fallingFromJump;
         this.fallingFromGround = fallingFromGround;
         this.dead = dead;
+        this.onLadder = onLadder;
     }
 }

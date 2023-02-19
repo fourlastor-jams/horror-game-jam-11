@@ -1,15 +1,10 @@
 package io.github.fourlastor.game.level.input.state;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import io.github.fourlastor.game.level.GameConfig;
-import io.github.fourlastor.game.level.component.AnimatedComponent;
-import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
 import io.github.fourlastor.game.level.unphysics.Transform;
-import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
-import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import javax.inject.Inject;
 
 public class Jumping extends HorizontalMovement {
@@ -19,15 +14,8 @@ public class Jumping extends HorizontalMovement {
     private float initialY;
 
     @Inject
-    public Jumping(
-            ComponentMapper<PlayerComponent> players,
-            ComponentMapper<KinematicBodyComponent> bodies,
-            ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs,
-            ComponentMapper<MovingBodyComponent> moving,
-            ComponentMapper<TransformComponent> transforms,
-            GameConfig config) {
-        super(players, bodies, animated, inputs, moving, transforms, config);
+    public Jumping(StateMappers mappers, GameConfig config) {
+        super(mappers, config);
         this.config = config;
     }
 
@@ -41,6 +29,7 @@ public class Jumping extends HorizontalMovement {
         super.enter(entity);
         MovingBodyComponent movingBodyComponent = moving.get(entity);
         movingBodyComponent.speed.y = config.player.jumpSpeed;
+        System.out.println(config.player.jumpSpeed);
         initialY = transforms.get(entity).transform.bottom();
     }
 
@@ -57,6 +46,7 @@ public class Jumping extends HorizontalMovement {
             movingComponent.speed.y = movingComponent.speed.y / 1.7f;
         }
         if (movingComponent.speed.y <= 0f) {
+            System.out.println("fall" + movingComponent.speed.y);
             PlayerComponent playerComponent = players.get(entity);
             playerComponent.stateMachine.changeState(playerComponent.fallingFromJump);
         }

@@ -93,9 +93,9 @@ public class LevelModule {
     @Provides
     public GameConfig gameConfig() {
         return new GameConfig(
-                new GameConfig.Display(256f * 3, 144f * 3, 1f),
+                new GameConfig.Display(256f, 144f, 1f),
                 new GameConfig.Physics(new Vector2(0f, -216)),
-                new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f),
+                new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f, 24f),
                 new GameConfig.Entities(0.7f));
     }
 }

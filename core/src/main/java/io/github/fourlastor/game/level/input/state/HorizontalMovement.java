@@ -1,30 +1,20 @@
 package io.github.fourlastor.game.level.input.state;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Interpolation;
+import io.github.fourlastor.game.level.Area;
 import io.github.fourlastor.game.level.GameConfig;
-import io.github.fourlastor.game.level.component.AnimatedComponent;
 import io.github.fourlastor.game.level.component.InputComponent;
 import io.github.fourlastor.game.level.component.PlayerComponent;
-import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
-import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
 import io.github.fourlastor.harlequin.ui.AnimationStateMachine;
 
 public abstract class HorizontalMovement extends CharacterState {
     private final GameConfig config;
     private float velocity = 0f;
 
-    public HorizontalMovement(
-            ComponentMapper<PlayerComponent> players,
-            ComponentMapper<KinematicBodyComponent> bodies,
-            ComponentMapper<AnimatedComponent> animated,
-            ComponentMapper<InputComponent> inputs,
-            ComponentMapper<MovingBodyComponent> moving,
-            ComponentMapper<TransformComponent> transforms,
-            GameConfig config) {
-        super(players, bodies, moving, transforms, animated, inputs);
+    public HorizontalMovement(StateMappers mappers, GameConfig config) {
+        super(mappers);
         this.config = config;
     }
 
@@ -33,6 +23,10 @@ public abstract class HorizontalMovement extends CharacterState {
         super.update(entity);
         InputComponent input = inputs.get(entity);
         PlayerComponent playerComponent = players.get(entity);
+        if (playerComponent.area == Area.LADDER && input.upPressed) {
+            playerComponent.stateMachine.changeState(playerComponent.onLadder);
+            return;
+        }
         if (input.movementChanged) {
             playerComponent.movementTime = 0f;
         }

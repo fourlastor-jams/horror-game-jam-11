@@ -9,4 +9,6 @@ public class InputComponent implements Component {
     public boolean movementChanged;
     public boolean jumpPressed;
     public boolean jumpJustPressed;
+    public boolean upPressed;
+    public boolean downPressed;
 }

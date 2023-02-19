@@ -214,6 +214,7 @@ public class BodyMovingSystem extends EntitySystem {
         moveKinematicX(dX, kinematicBody, kinematicTransform);
         float dY = delta * (movingBody.speed.y + delta * gravity.x / 2);
         moveKinematicY(dY, kinematicBody, movingBody, kinematicTransform);
+        checkSensors(kinematicBody, kinematicTransform.area());
     }
 
     private void resetCollisions(KinematicBodyComponent kinematicBody) {
@@ -270,7 +271,6 @@ public class BodyMovingSystem extends EntitySystem {
             // There is no Solid immediately beside us
             kinematicBody.touching.x = 0;
             transform.moveXBy(amount);
-            checkSensors(kinematicBody, transform.area());
             return false;
         }
     }
@@ -291,7 +291,6 @@ public class BodyMovingSystem extends EntitySystem {
             // There is no Solid immediately beside us
             kinematicBody.touching.y = 0;
             transform.moveYBy(amount);
-            checkSensors(kinematicBody, transform.area());
             return false;
         }
     }
