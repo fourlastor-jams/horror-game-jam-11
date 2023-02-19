@@ -8,13 +8,13 @@ import com.badlogic.gdx.math.Vector2;
 import io.github.fourlastor.game.level.component.MovingComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
-
 import java.util.List;
 import javax.inject.Inject;
 
 public class MovingSystem extends IteratingSystem {
-    private static final Family FAMILY =
-            Family.all(MovingComponent.class, MovingBodyComponent.class, TransformComponent.class).get();
+    private static final Family FAMILY = Family.all(
+                    MovingComponent.class, MovingBodyComponent.class, TransformComponent.class)
+            .get();
 
     private final ComponentMapper<MovingBodyComponent> bodies;
     private final ComponentMapper<TransformComponent> transforms;
@@ -23,7 +23,10 @@ public class MovingSystem extends IteratingSystem {
     private final Vector2 velocity = new Vector2();
 
     @Inject
-    public MovingSystem(ComponentMapper<MovingBodyComponent> bodies, ComponentMapper<TransformComponent> transforms, ComponentMapper<MovingComponent> movables) {
+    public MovingSystem(
+            ComponentMapper<MovingBodyComponent> bodies,
+            ComponentMapper<TransformComponent> transforms,
+            ComponentMapper<MovingComponent> movables) {
         super(FAMILY);
         this.bodies = bodies;
         this.transforms = transforms;

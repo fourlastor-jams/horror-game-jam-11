@@ -209,7 +209,11 @@ public class EntitiesFactory {
                 image.setSize(instance.width, instance.height);
                 entity.add(new FollowBodyComponent());
                 entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
-                entity.add(new TransformComponent(new Transform(new Rectangle(instance.x() , instance.y(entityLayer.cHei, entityLayer.gridSize), instance.width, instance.height))));
+                entity.add(new TransformComponent(new Transform(new Rectangle(
+                        instance.x(),
+                        instance.y(entityLayer.cHei, entityLayer.gridSize),
+                        instance.width,
+                        instance.height))));
                 entity.add(new MovingBodyComponent());
                 entity.add(new SolidBodyComponent());
 

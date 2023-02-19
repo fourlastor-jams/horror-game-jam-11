@@ -71,7 +71,8 @@ public class BodyMovingSystem extends EntitySystem {
         immobileSolids = new LongMap<>();
         immobileSensors = new LongMap<>();
         solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
-        solidMovingEntitiesCollisions = new Array<>(false, solidMovingEntities.toArray(Entity.class), 0, solidMovingEntities.size());
+        solidMovingEntitiesCollisions =
+                new Array<>(false, solidMovingEntities.toArray(Entity.class), 0, solidMovingEntities.size());
         engine.addEntityListener(FAMILY_SOLID_MOVING, new EntityListener() {
             @Override
             public void entityAdded(Entity entity) {
