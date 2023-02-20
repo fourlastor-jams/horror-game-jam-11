@@ -88,7 +88,14 @@ public class LevelScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        long start = System.currentTimeMillis();
         engine.update(delta);
+        long deltaMs = System.currentTimeMillis() - start;
+        if (deltaMs * 1000 < delta) {
+            System.out.println("ok");
+        } else {
+            System.out.println("slow");
+        }
     }
 
     @Override
