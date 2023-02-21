@@ -1,4 +1,4 @@
-    package io.github.fourlastor.game.level.unphysics.system;
+package io.github.fourlastor.game.level.unphysics.system;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -9,69 +9,67 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import io.github.fourlastor.game.level.unphysics.Transform;
-import io.github.fourlastor.game.level.unphysics.component.GravityComponent;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SensorBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.SolidBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.TransformComponent;
-
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
+import javax.inject.Inject;
 
-    /**
+/**
  * @see <a href="https://github.com/OneLoneCoder/Javidx9/blob/master/PixelGameEngine/SmallerProjects/OneLoneCoder_PGE_Rectangles.cpp">Tutorial by Maddy Thorson</a>
  */
 public class RayCastSystem extends EntitySystem {
 
-    private static final Family FAMILY_SOLID_IMMOBILE = Family.all(SolidBodyComponent.class, TransformComponent.class)
-            .exclude(MovingBodyComponent.class)
+    private static final Family FAMILY_SOLID =
+            Family.all(SolidBodyComponent.class, TransformComponent.class).get();
+    private static final Family FAMILY_SOLID_MOVING = Family.all(
+                    SolidBodyComponent.class, TransformComponent.class, MovingBodyComponent.class)
             .get();
-    private static final Family FAMILY_SENSOR = Family.all(SensorBodyComponent.class, TransformComponent.class)
-            .get();
+    private static final Family FAMILY_SENSOR =
+            Family.all(SensorBodyComponent.class, TransformComponent.class).get();
     private static final Family FAMILY_KINEMATIC =
             Family.all(MovingBodyComponent.class, KinematicBodyComponent.class).get();
     private static final float CHUNK_SIZE = 16 * 5f;
-    private static final float STEP = 1f / 60f;
 
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
     private final ComponentMapper<SolidBodyComponent> solidBodies;
     private final ComponentMapper<SensorBodyComponent> sensorBodies;
     private final ComponentMapper<KinematicBodyComponent> kinematicBodies;
-    private final ComponentMapper<GravityComponent> gravities;
     private ImmutableArray<Entity> kinematicEntities;
     private ImmutableArray<Entity> sensorEntities;
+    private ImmutableArray<Entity> solidMovingEntities;
     private final PriorityQueue<Contact> contacts = new PriorityQueue<>((o1, o2) -> Float.compare(o1.t, o2.t));
     private final Rectangle expandedTarget = new Rectangle();
 
-        @Inject
+    @Inject
     public RayCastSystem(
             ComponentMapper<TransformComponent> transforms,
             ComponentMapper<MovingBodyComponent> movingBodies,
             ComponentMapper<SolidBodyComponent> solidBodies,
             ComponentMapper<SensorBodyComponent> sensorBodies,
-            ComponentMapper<KinematicBodyComponent> kinematicBodies,
-            ComponentMapper<GravityComponent> gravities) {
+            ComponentMapper<KinematicBodyComponent> kinematicBodies) {
         this.transforms = transforms;
         this.movingBodies = movingBodies;
         this.solidBodies = solidBodies;
         this.sensorBodies = sensorBodies;
         this.kinematicBodies = kinematicBodies;
-        this.gravities = gravities;
     }
 
     private final List<Entity> solidEntities = new ArrayList<>();
+
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        engine.addEntityListener(FAMILY_SOLID_IMMOBILE, solidEntitiesListener);
+        engine.addEntityListener(FAMILY_SOLID, solidEntitiesListener);
         kinematicEntities = engine.getEntitiesFor(FAMILY_KINEMATIC);
         sensorEntities = engine.getEntitiesFor(FAMILY_SENSOR);
+        solidMovingEntities = engine.getEntitiesFor(FAMILY_SOLID_MOVING);
     }
 
     @Override
@@ -85,16 +83,15 @@ public class RayCastSystem extends EntitySystem {
 
     @Override
     public void update(float deltaTime) {
-        while (deltaTime > 0f) {
-//            for (Entity entity : solidMovingEntities) {
-//                moveSolid(entity, deltaTime);
-//            }
-            for (Entity entity : kinematicEntities) {
-                moveKinematic(entity, deltaTime);
-            }
-            deltaTime -= STEP;
+        for (Entity entity : solidMovingEntities) {
+            moveSolid(entity, deltaTime);
+        }
+        for (Entity entity : kinematicEntities) {
+            moveKinematic(entity, deltaTime, movingBodies.get(entity).speed);
         }
     }
+
+    private final Vector2 movingSpeedFromSolid = new Vector2();
 
     private void moveSolid(Entity entity, float delta) {
         MovingBodyComponent movingBody = movingBodies.get(entity);
@@ -102,37 +99,83 @@ public class RayCastSystem extends EntitySystem {
         Transform transform = transforms.get(entity).transform;
         float moveX = movingBody.speed.x * delta;
         float moveY = movingBody.speed.y * delta;
+        if (moveX != 0 || moveY != 0) {
+            solidBody.canCollide = false;
+            for (Entity kinematicEntity : kinematicEntities) {
+                Transform kinematicTransform = transforms.get(kinematicEntity).transform;
+                if (isRiding(kinematicTransform, transform)) {
+                    moveKinematic(kinematicEntity, delta, movingSpeedFromSolid.set(moveX / delta, moveY / delta));
+                }
+            }
+            if (moveX != 0) {
+                transform.moveXBy(moveX);
+            }
+            if (moveY != 0) {
+                transform.moveYBy(moveY);
+            }
+            // Re-enable collisions for this Solid
+            solidBody.canCollide = true;
+        }
     }
 
+    private final Vector2 solidCenterTmp = new Vector2();
+    private final Vector2 kinematicCenterTmp = new Vector2();
 
-    private void moveKinematic(Entity entity, float delta) {
-        MovingBodyComponent movingBody = movingBodies.get(entity);
+    private boolean isPushing(Transform solidTransform, Transform kinematicTransform, Vector2 direction) {
+        Rectangle solidArea = solidTransform.area();
+        Rectangle kinematicArea = kinematicTransform.area();
+        if (!solidArea.overlaps(kinematicArea)) {
+            return false;
+        }
+
+        Vector2 solidCenter = solidArea.getCenter(solidCenterTmp);
+        Vector2 bodyDirection = kinematicArea.getCenter(kinematicCenterTmp).sub(solidCenter);
+        if (direction.x != 0) {
+            return Math.abs(bodyDirection.x) > Math.abs(bodyDirection.y) && bodyDirection.x * direction.x > 0;
+        } else {
+            return Math.abs(bodyDirection.y) > Math.abs(bodyDirection.x) && bodyDirection.y * direction.y > 0;
+        }
+    }
+
+    private boolean isRiding(Transform kinematicTransform, Transform solidTransform) {
+        Rectangle kinematicArea = kinematicTransform.area();
+        Rectangle solidArea = solidTransform.area();
+        return kinematicArea.overlaps(solidArea)
+                || offsetBy(kinematicArea, 0, -1).overlaps(solidArea);
+    }
+
+    private void moveKinematic(Entity entity, float delta, Vector2 speed) {
         KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
         Transform inputTransform = transforms.get(entity).transform;
-        Vector2 gravity = gravities.get(entity).gravity;
         Rectangle inputRect = inputTransform.area();
         contacts.clear();
         for (int i = 0; i < solidEntities.size(); i++) {
             Entity solidEntity = solidEntities.get(i);
             Rectangle targetRect = transforms.get(solidEntity).transform.area();
+            if (!solidBodies.get(solidEntity).canCollide) {
+                continue;
+            }
             Contact contact = new Contact();
             contact.id = i;
-            if (dynamicRectVsRect(inputRect, movingBody.speed, delta, targetRect, contact)) {
+            if (dynamicRectVsRect(inputRect, speed, delta, targetRect, contact)) {
                 contacts.add(contact);
             }
+        }
+        if (contacts.isEmpty()) {
+            kinematicBody.touching.set(0, 0);
         }
         Contact contact = contacts.poll();
         while (contact != null) {
             Entity solidEntity = solidEntities.get(contact.id);
             Rectangle targetRect = transforms.get(solidEntity).transform.area();
-            if (resolveDynamicRectVsRect(inputRect, movingBody.speed, delta, targetRect, contact)) {
+            if (resolveDynamicRectVsRect(inputRect, speed, delta, targetRect, contact)) {
                 kinematicBody.touching.set((int) contact.normal.x, (int) contact.normal.y);
             }
             contact = contacts.poll();
         }
 
-        float dX = delta * (movingBody.speed.x + delta * gravity.x / 2);
-        float dY = delta * (movingBody.speed.y + delta * gravity.x / 2);
+        float dX = delta * speed.x;
+        float dY = delta * speed.y;
         inputTransform.moveXBy(dX);
         inputTransform.moveYBy(dY);
         checkSensors(kinematicBody, inputRect);
@@ -144,7 +187,6 @@ public class RayCastSystem extends EntitySystem {
             kinematicBody.sensors.clear();
         }
     }
-
 
     private final Rectangle tmp = new Rectangle();
 
@@ -242,7 +284,8 @@ public class RayCastSystem extends EntitySystem {
         return true;
     }
 
-    private boolean dynamicRectVsRect(Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact) {
+    private boolean dynamicRectVsRect(
+            Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact) {
         // Check if dynamic rectangle is actually moving - we assume rectangles are NOT in collision to start
         if (velocity.x == 0 && velocity.y == 0) {
             return false;
@@ -252,18 +295,21 @@ public class RayCastSystem extends EntitySystem {
                 staticRect.x - dynamicRect.width / 2f,
                 staticRect.y - dynamicRect.height / 2f,
                 staticRect.width + dynamicRect.width,
-                staticRect.height + dynamicRect.height
-        );
+                staticRect.height + dynamicRect.height);
 
-        if (rayVsRect(dynamicRect.getCenter(dynamicCenter), scaledVelocity.set(velocity).scl(timeStep), expandedTarget, contact)) {
+        if (rayVsRect(
+                dynamicRect.getCenter(dynamicCenter),
+                scaledVelocity.set(velocity).scl(timeStep),
+                expandedTarget,
+                contact)) {
             return contact.t >= 0f && contact.t < 1f;
         } else {
             return false;
         }
     }
 
-    private boolean resolveDynamicRectVsRect(Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact)
-    {
+    private boolean resolveDynamicRectVsRect(
+            Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact) {
         Rectangle[] contacts = new Rectangle[4];
         if (dynamicRectVsRect(dynamicRect, velocity, timeStep, staticRect, contact)) {
             contacts[0] = contact.normal.y > 0 ? staticRect : null;
@@ -271,7 +317,10 @@ public class RayCastSystem extends EntitySystem {
             contacts[2] = contact.normal.y < 0 ? staticRect : null;
             contacts[3] = contact.normal.x > 0 ? staticRect : null;
             // reduce speed to ensure there is no contact
-            velocity.add(velocityDelta.set(Math.abs(velocity.x), Math.abs(velocity.y)).scl(contact.normal).scl(1- contact.t));
+            velocity.add(velocityDelta
+                    .set(Math.abs(velocity.x), Math.abs(velocity.y))
+                    .scl(contact.normal)
+                    .scl(1 - contact.t));
             return true;
         }
 
@@ -291,8 +340,6 @@ public class RayCastSystem extends EntitySystem {
             t = 0;
         }
     }
-
-
 
     private final EntityListener solidEntitiesListener = new EntityListener() {
         @Override
