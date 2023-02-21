@@ -38,7 +38,7 @@ public class Jumping extends HorizontalMovement {
         MovingBodyComponent movingComponent = moving.get(entity);
         Transform transform = transforms.get(entity).transform;
         float distanceTravelled = Math.abs(transform.bottom() - initialY);
-        if (bodies.get(entity).touching.y == 1) {
+        if (bodies.get(entity).touching.y == -1) {
             movingComponent.speed.y = movingComponent.speed.y / 5f;
         }
         if (config.player.minJumpHeight <= distanceTravelled && !inputs.get(entity).jumpPressed) {
