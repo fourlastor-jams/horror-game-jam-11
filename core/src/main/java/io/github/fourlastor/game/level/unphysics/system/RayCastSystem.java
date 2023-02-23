@@ -169,7 +169,10 @@ public class RayCastSystem extends EntitySystem {
             Entity solidEntity = solidEntities.get(contact.id);
             Rectangle targetRect = transforms.get(solidEntity).transform.area();
             if (resolveDynamicRectVsRect(inputRect, speed, delta, targetRect, contact)) {
-                kinematicBody.touching.set((int) contact.normal.x, (int) contact.normal.y);
+                kinematicBody.touching.set(
+                        contact.normal.x != 0 ? (int) contact.normal.x : kinematicBody.touching.x,
+                        contact.normal.y != 0 ? (int) contact.normal.y : kinematicBody.touching.y
+                );
             }
             contact = contacts.poll();
         }
@@ -294,7 +297,7 @@ public class RayCastSystem extends EntitySystem {
         expandedTarget.set(
                 staticRect.x - dynamicRect.width / 2f,
                 staticRect.y - dynamicRect.height / 2f,
-                staticRect.width + dynamicRect.width,
+                staticRect.width + dynamicRect.width ,
                 staticRect.height + dynamicRect.height);
 
         if (rayVsRect(
