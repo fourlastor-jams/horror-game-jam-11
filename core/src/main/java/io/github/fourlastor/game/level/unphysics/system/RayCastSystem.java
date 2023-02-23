@@ -302,7 +302,7 @@ public class RayCastSystem extends EntitySystem {
                 scaledVelocity.set(velocity).scl(timeStep),
                 expandedTarget,
                 contact)) {
-            return contact.t >= 0f && contact.t < 1f;
+            return contact.t >= -0.1f && contact.t < 1f;
         } else {
             return false;
         }
