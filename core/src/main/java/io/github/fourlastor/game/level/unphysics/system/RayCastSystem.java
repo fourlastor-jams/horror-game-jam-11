@@ -34,7 +34,6 @@ public class RayCastSystem extends EntitySystem {
             Family.all(SensorBodyComponent.class, TransformComponent.class).get();
     private static final Family FAMILY_KINEMATIC =
             Family.all(MovingBodyComponent.class, KinematicBodyComponent.class).get();
-    private static final float CHUNK_SIZE = 16 * 5f;
 
     private final ComponentMapper<TransformComponent> transforms;
     private final ComponentMapper<MovingBodyComponent> movingBodies;
@@ -228,22 +227,6 @@ public class RayCastSystem extends EntitySystem {
         return sensorBody.canCollide && transform.area().overlaps(area);
     }
 
-    private static int chunkStartX(Rectangle area) {
-        return (int) (area.x / CHUNK_SIZE);
-    }
-
-    private static int chunkEndX(Rectangle area) {
-        return (int) ((area.x + area.width) / CHUNK_SIZE);
-    }
-
-    private static int chunkStartY(Rectangle area) {
-        return (int) (area.y / CHUNK_SIZE);
-    }
-
-    private static int chunkEndY(Rectangle area) {
-        return (int) ((area.y + area.height) / CHUNK_SIZE);
-    }
-
     private final Vector2 invDir = new Vector2();
     private final Vector2 tNear = new Vector2();
     private final Vector2 tFar = new Vector2();
@@ -373,8 +356,4 @@ public class RayCastSystem extends EntitySystem {
             solidEntities.remove(entity);
         }
     };
-
-    private long fusedCoordinates(int x, int y) {
-        return (long) x << 32 | (y & 0xFFFFFFFFL);
-    }
 }
