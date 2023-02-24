@@ -46,7 +46,7 @@ abstract class Falling extends HorizontalMovement {
         if (inputs.get(entity).jumpJustPressed) {
             attemptedTime = fallingTime;
         }
-        if (bodies.get(entity).touching.y == -1) {
+        if (bodies.get(entity).touching.y == 1) {
             PlayerComponent playerComponent = players.get(entity);
             if (attemptedTime >= 0 && fallingTime - attemptedTime < config.player.fallingGraceTime) {
                 playerComponent.stateMachine.changeState(playerComponent.jumping);

@@ -21,8 +21,8 @@ import io.github.fourlastor.game.level.system.ClearScreenSystem;
 import io.github.fourlastor.game.level.system.MovingSystem;
 import io.github.fourlastor.game.level.system.StageSystem;
 import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
-import io.github.fourlastor.game.level.unphysics.system.BodyMovingSystem;
 import io.github.fourlastor.game.level.unphysics.system.GravitySystem;
+import io.github.fourlastor.game.level.unphysics.system.RayCastSystem;
 import io.github.fourlastor.game.level.unphysics.system.TransformDebugSystem;
 
 @Module
@@ -37,7 +37,7 @@ public class LevelModule {
             CameraMovementSystem cameraMovementSystem,
             StageSystem stageSystem,
             ClearScreenSystem clearScreenSystem,
-            BodyMovingSystem bodyMovingSystem,
+            RayCastSystem bodyMovingSystem,
             GravitySystem gravitySystem,
             MovingSystem movingSystem,
             ActorFollowTransformSystem actorFollowTransformSystem,
@@ -93,7 +93,7 @@ public class LevelModule {
     @Provides
     public GameConfig gameConfig() {
         return new GameConfig(
-                new GameConfig.Display(256f * 5, 144f * 5, 1f),
+                new GameConfig.Display(256f * 1, 144f * 1, 1f),
                 new GameConfig.Physics(new Vector2(0f, -216)),
                 new GameConfig.Player(96f, 0.1f, 16f, 48f, 144f, 0.2f, 2f, 24f),
                 new GameConfig.Entities(0.7f));

@@ -101,11 +101,11 @@ public class BodyMovingSystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         while (deltaTime > 0f) {
-            for (Entity entity : kinematicEntities) {
-                moveKinematic(entity, deltaTime);
-            }
             for (Entity entity : solidMovingEntities) {
                 moveSolid(entity, deltaTime);
+            }
+            for (Entity entity : kinematicEntities) {
+                moveKinematic(entity, deltaTime);
             }
             deltaTime -= STEP;
         }
@@ -212,7 +212,7 @@ public class BodyMovingSystem extends EntitySystem {
         resetCollisions(kinematicBody);
         float dX = delta * (movingBody.speed.x + delta * gravity.x / 2);
         moveKinematicX(dX, kinematicBody, kinematicTransform);
-        float dY = delta * (movingBody.speed.y + delta * gravity.x / 2);
+        float dY = delta * (movingBody.speed.y + delta * gravity.y / 2);
         moveKinematicY(dY, kinematicBody, movingBody, kinematicTransform);
         checkSensors(kinematicBody, kinematicTransform.area());
     }
