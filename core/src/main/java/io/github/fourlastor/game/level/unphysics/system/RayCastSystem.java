@@ -92,6 +92,7 @@ public class RayCastSystem extends EntitySystem {
     }
 
     private final Vector2 movingSpeedFromSolid = new Vector2();
+    private final Contact movingSolidContact = new Contact();
 
     private void moveSolid(Entity entity, float delta) {
         MovingBodyComponent movingBody = movingBodies.get(entity);
@@ -103,7 +104,19 @@ public class RayCastSystem extends EntitySystem {
             solidBody.canCollide = false;
             for (Entity kinematicEntity : kinematicEntities) {
                 Transform kinematicTransform = transforms.get(kinematicEntity).transform;
-                if (isRiding(kinematicTransform, transform)) {
+                if (isPushing(transform, kinematicTransform, movingBody.speed)) {
+                    resolveDynamicRectVsRect(transform.area(), movingBody.speed, delta, kinematicTransform.area(), movingSolidContact);
+                    float amountX;
+                    float amountY;
+                    if (movingSolidContact.normal.x != 0) {
+                        amountX = moveX > 0 ? transform.right() - kinematicTransform.left(): transform.left() - kinematicTransform.right();
+                        amountY = 0;
+                    } else {
+                        amountX = 0;
+                        amountY = moveY > 0 ? transform.top() - kinematicTransform.bottom(): transform.bottom() - kinematicTransform.top();
+                    }
+                    moveKinematic(kinematicEntity, delta, movingSpeedFromSolid.set(amountX / delta, amountY / delta));
+                } else if (isRiding(kinematicTransform, transform)) {
                     moveKinematic(kinematicEntity, delta, movingSpeedFromSolid.set(moveX / delta, moveY / delta));
                 }
             }
