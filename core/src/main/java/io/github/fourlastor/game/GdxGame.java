@@ -34,7 +34,6 @@ public class GdxGame extends Game implements Router {
     public void create() {
         Gdx.input.setInputProcessor(multiplexer);
         goToLevel(1);
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
     }
 
     @Override
