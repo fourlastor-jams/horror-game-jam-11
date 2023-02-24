@@ -9,6 +9,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.FlushablePool;
+import com.badlogic.gdx.utils.Pool;
 import io.github.fourlastor.game.level.unphysics.Transform;
 import io.github.fourlastor.game.level.unphysics.component.KinematicBodyComponent;
 import io.github.fourlastor.game.level.unphysics.component.MovingBodyComponent;
@@ -58,6 +60,7 @@ public class RayCastSystem extends EntitySystem {
         this.solidBodies = solidBodies;
         this.sensorBodies = sensorBodies;
         this.kinematicBodies = kinematicBodies;
+        contactPool.fill(16);
     }
 
     private final List<Entity> solidEntities = new ArrayList<>();
@@ -92,7 +95,6 @@ public class RayCastSystem extends EntitySystem {
     }
 
     private final Vector2 movingSpeedFromSolid = new Vector2();
-    private final Contact movingSolidContact = new Contact();
 
     private void moveSolid(Entity entity, float delta) {
         MovingBodyComponent movingBody = movingBodies.get(entity);
@@ -101,15 +103,16 @@ public class RayCastSystem extends EntitySystem {
         float moveX = movingBody.speed.x * delta;
         float moveY = movingBody.speed.y * delta;
         if (moveX != 0 || moveY != 0) {
+            Contact contact = contactPool.obtain();
             solidBody.canCollide = false;
             for (Entity kinematicEntity : kinematicEntities) {
                 Transform kinematicTransform = transforms.get(kinematicEntity).transform;
                 if (isPushing(transform, kinematicTransform, movingBody.speed)) {
                     resolveDynamicRectVsRect(
-                            transform.area(), movingBody.speed, delta, kinematicTransform.area(), movingSolidContact);
+                            transform.area(), movingBody.speed, delta, kinematicTransform.area(), contact);
                     float amountX;
                     float amountY;
-                    if (movingSolidContact.normal.x != 0) {
+                    if (contact.normal.x != 0) {
                         amountX = moveX > 0
                                 ? transform.right() - kinematicTransform.left()
                                 : transform.left() - kinematicTransform.right();
@@ -133,6 +136,7 @@ public class RayCastSystem extends EntitySystem {
             }
             // Re-enable collisions for this Solid
             solidBody.canCollide = true;
+            contactPool.free(contact);
         }
     }
 
@@ -162,18 +166,26 @@ public class RayCastSystem extends EntitySystem {
                 || offsetBy(kinematicArea, 0, -1).overlaps(solidArea);
     }
 
+    private final FlushablePool<Contact> contactPool = new FlushablePool<Contact>() {
+        @Override
+        protected Contact newObject() {
+            return new Contact();
+        }
+    };
+
     private void moveKinematic(Entity entity, float delta, Vector2 speed) {
         KinematicBodyComponent kinematicBody = kinematicBodies.get(entity);
         Transform inputTransform = transforms.get(entity).transform;
         Rectangle inputRect = inputTransform.area();
         contacts.clear();
+        contactPool.flush();
         for (int i = 0; i < solidEntities.size(); i++) {
             Entity solidEntity = solidEntities.get(i);
             Rectangle targetRect = transforms.get(solidEntity).transform.area();
             if (!solidBodies.get(solidEntity).canCollide) {
                 continue;
             }
-            Contact contact = new Contact();
+            Contact contact = contactPool.obtain();
             contact.id = i;
             if (dynamicRectVsRect(inputRect, speed, delta, targetRect, contact)) {
                 contacts.add(contact);
@@ -314,12 +326,12 @@ public class RayCastSystem extends EntitySystem {
 
     private boolean resolveDynamicRectVsRect(
             Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact) {
-//        Rectangle[] contacts = new Rectangle[4];
+        //        Rectangle[] contacts = new Rectangle[4];
         if (dynamicRectVsRect(dynamicRect, velocity, timeStep, staticRect, contact)) {
-//            contacts[0] = contact.normal.y > 0 ? staticRect : null;
-//            contacts[1] = contact.normal.x < 0 ? staticRect : null;
-//            contacts[2] = contact.normal.y < 0 ? staticRect : null;
-//            contacts[3] = contact.normal.x > 0 ? staticRect : null;
+            //            contacts[0] = contact.normal.y > 0 ? staticRect : null;
+            //            contacts[1] = contact.normal.x < 0 ? staticRect : null;
+            //            contacts[2] = contact.normal.y < 0 ? staticRect : null;
+            //            contacts[3] = contact.normal.x > 0 ? staticRect : null;
             // reduce speed to ensure there is no contact
             velocity.add(velocityDelta
                     .set(Math.abs(velocity.x), Math.abs(velocity.y))
@@ -331,12 +343,13 @@ public class RayCastSystem extends EntitySystem {
         return false;
     }
 
-    private static class Contact {
+    private static class Contact implements Pool.Poolable {
         public final Vector2 normal = new Vector2();
         public final Vector2 point = new Vector2();
         public int id;
         public float t;
 
+        @Override
         public void reset() {
             normal.set(Vector2.Zero);
             point.set(Vector2.Zero);
