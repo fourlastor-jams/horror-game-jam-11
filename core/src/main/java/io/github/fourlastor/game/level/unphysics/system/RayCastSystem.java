@@ -105,15 +105,20 @@ public class RayCastSystem extends EntitySystem {
             for (Entity kinematicEntity : kinematicEntities) {
                 Transform kinematicTransform = transforms.get(kinematicEntity).transform;
                 if (isPushing(transform, kinematicTransform, movingBody.speed)) {
-                    resolveDynamicRectVsRect(transform.area(), movingBody.speed, delta, kinematicTransform.area(), movingSolidContact);
+                    resolveDynamicRectVsRect(
+                            transform.area(), movingBody.speed, delta, kinematicTransform.area(), movingSolidContact);
                     float amountX;
                     float amountY;
                     if (movingSolidContact.normal.x != 0) {
-                        amountX = moveX > 0 ? transform.right() - kinematicTransform.left(): transform.left() - kinematicTransform.right();
+                        amountX = moveX > 0
+                                ? transform.right() - kinematicTransform.left()
+                                : transform.left() - kinematicTransform.right();
                         amountY = 0;
                     } else {
                         amountX = 0;
-                        amountY = moveY > 0 ? transform.top() - kinematicTransform.bottom(): transform.bottom() - kinematicTransform.top();
+                        amountY = moveY > 0
+                                ? transform.top() - kinematicTransform.bottom()
+                                : transform.bottom() - kinematicTransform.top();
                     }
                     moveKinematic(kinematicEntity, delta, movingSpeedFromSolid.set(amountX / delta, amountY / delta));
                 } else if (isRiding(kinematicTransform, transform)) {
@@ -184,8 +189,7 @@ public class RayCastSystem extends EntitySystem {
             if (resolveDynamicRectVsRect(inputRect, speed, delta, targetRect, contact)) {
                 kinematicBody.touching.set(
                         contact.normal.x != 0 ? (int) contact.normal.x : kinematicBody.touching.x,
-                        contact.normal.y != 0 ? (int) contact.normal.y : kinematicBody.touching.y
-                );
+                        contact.normal.y != 0 ? (int) contact.normal.y : kinematicBody.touching.y);
             }
             contact = contacts.poll();
         }
@@ -310,7 +314,7 @@ public class RayCastSystem extends EntitySystem {
         expandedTarget.set(
                 staticRect.x - dynamicRect.width / 2f,
                 staticRect.y - dynamicRect.height / 2f,
-                staticRect.width + dynamicRect.width ,
+                staticRect.width + dynamicRect.width,
                 staticRect.height + dynamicRect.height);
 
         if (rayVsRect(
