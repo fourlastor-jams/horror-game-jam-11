@@ -87,6 +87,7 @@ public class RayCastSystem extends EntitySystem {
             moveSolid(entity, deltaTime);
         }
         for (Entity entity : kinematicEntities) {
+            resetCollisions(kinematicBodies.get(entity));
             moveKinematic(entity, deltaTime, movingBodies.get(entity).speed);
         }
     }
