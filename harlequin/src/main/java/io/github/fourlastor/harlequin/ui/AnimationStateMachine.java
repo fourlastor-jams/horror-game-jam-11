@@ -8,6 +8,7 @@ import io.github.fourlastor.harlequin.animation.AnimationNode;
 public class AnimationStateMachine extends Group implements StateActor {
 
     private boolean sizeComputed = false;
+    private boolean animating = true;
 
     public AnimationStateMachine(AnimationNode.Group node) {
         setPosition(node.x, node.y);
@@ -17,6 +18,17 @@ public class AnimationStateMachine extends Group implements StateActor {
             } else if (child instanceof AnimationNode.Image) {
                 addActor(new AnimationImage(((AnimationNode.Image) child)));
             }
+        }
+    }
+
+    public void setAnimating(Boolean animating) {
+        this.animating = animating;
+    }
+
+    @Override
+    public void act(float delta) {
+        if (animating) {
+            super.act(delta);
         }
     }
 
