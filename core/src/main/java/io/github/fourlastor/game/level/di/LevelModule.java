@@ -21,7 +21,6 @@ import io.github.fourlastor.game.level.system.ClearScreenSystem;
 import io.github.fourlastor.game.level.system.MovingSystem;
 import io.github.fourlastor.game.level.system.StageSystem;
 import io.github.fourlastor.game.level.unphysics.system.ActorFollowTransformSystem;
-import io.github.fourlastor.game.level.unphysics.system.BodyMovingSystem;
 import io.github.fourlastor.game.level.unphysics.system.GravitySystem;
 import io.github.fourlastor.game.level.unphysics.system.RayCastSystem;
 import io.github.fourlastor.game.level.unphysics.system.TransformDebugSystem;
