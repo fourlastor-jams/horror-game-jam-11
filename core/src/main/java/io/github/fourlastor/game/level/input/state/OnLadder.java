@@ -24,7 +24,7 @@ public class OnLadder extends CharacterState {
 
     @Override
     protected String animation() {
-        return "idle";
+        return "climb";
     }
 
     @Override
@@ -68,6 +68,7 @@ public class OnLadder extends CharacterState {
         if (input.rightPressed) {
             velocity.x += 1;
         }
+        animated.get(entity).stateMachine.setAnimating(!velocity.equals(Vector2.Zero));
         moving.get(entity).speed.set(velocity.scl(config.player.ladderSpeed));
     }
 }
