@@ -1171,7 +1171,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [2,34],
+							"__grid": [29,16],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1180,7 +1180,7 @@
 							"width": 8,
 							"height": 16,
 							"defUid": 76,
-							"px": [32,544],
+							"px": [464,256],
 							"fieldInstances": []
 						},
 						{
@@ -1514,6 +1514,52 @@
 							"fieldInstances": [
 								{ "__identifier": "Colliding", "__value": true, "__type": "Bool", "__tile": null, "defUid": 85, "realEditorValues": [] },
 								{ "__identifier": "Period", "__value": 4, "__type": "Float", "__tile": null, "defUid": 86, "realEditorValues": [{ "id": "V_Float", "params": [4] }] }
+							]
+						},
+						{
+							"__identifier": "Moving_floor",
+							"__grid": [16,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cfcff550-9f30-11ed-99aa-57158af16349",
+							"width": 48,
+							"height": 16,
+							"defUid": 87,
+							"px": [256,208],
+							"fieldInstances": [
+								{ "__identifier": "Speed", "__value": 2, "__type": "Float", "__tile": null, "defUid": 88, "realEditorValues": [] },
+								{ "__identifier": "Path", "__value": [ { "cx": 30, "cy": 13 }, { "cx": 15, "cy": 13 } ], "__type": "Array<Point>", "__tile": null, "defUid": 89, "realEditorValues": [ {
+									"id": "V_String",
+									"params": ["30,13"]
+								}, {
+									"id": "V_String",
+									"params": ["15,13"]
+								} ] }
+							]
+						},
+						{
+							"__identifier": "Moving_floor",
+							"__grid": [19,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "d1062b60-9f30-11ed-99aa-7944feda4e2c",
+							"width": 64,
+							"height": 16,
+							"defUid": 87,
+							"px": [304,224],
+							"fieldInstances": [
+								{ "__identifier": "Speed", "__value": 2, "__type": "Float", "__tile": null, "defUid": 88, "realEditorValues": [] },
+								{ "__identifier": "Path", "__value": [ { "cx": 17, "cy": 14 }, { "cx": 26, "cy": 14 } ], "__type": "Array<Point>", "__tile": null, "defUid": 89, "realEditorValues": [ {
+									"id": "V_String",
+									"params": ["17,14"]
+								}, {
+									"id": "V_String",
+									"params": ["26,14"]
+								} ] }
 							]
 						}
 					]
@@ -2104,7 +2150,7 @@
 						},
 						{
 							"__identifier": "Player",
-							"__grid": [52,14],
+							"__grid": [83,48],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -2113,7 +2159,7 @@
 							"width": 8,
 							"height": 16,
 							"defUid": 76,
-							"px": [832,224],
+							"px": [1328,768],
 							"fieldInstances": []
 						},
 						{
