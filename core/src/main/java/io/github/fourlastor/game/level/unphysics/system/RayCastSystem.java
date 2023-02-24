@@ -331,12 +331,12 @@ public class RayCastSystem extends EntitySystem {
 
     private boolean resolveDynamicRectVsRect(
             Rectangle dynamicRect, Vector2 velocity, float timeStep, Rectangle staticRect, Contact contact) {
-        Rectangle[] contacts = new Rectangle[4];
+//        Rectangle[] contacts = new Rectangle[4];
         if (dynamicRectVsRect(dynamicRect, velocity, timeStep, staticRect, contact)) {
-            contacts[0] = contact.normal.y > 0 ? staticRect : null;
-            contacts[1] = contact.normal.x < 0 ? staticRect : null;
-            contacts[2] = contact.normal.y < 0 ? staticRect : null;
-            contacts[3] = contact.normal.x > 0 ? staticRect : null;
+//            contacts[0] = contact.normal.y > 0 ? staticRect : null;
+//            contacts[1] = contact.normal.x < 0 ? staticRect : null;
+//            contacts[2] = contact.normal.y < 0 ? staticRect : null;
+//            contacts[3] = contact.normal.x > 0 ? staticRect : null;
             // reduce speed to ensure there is no contact
             velocity.add(velocityDelta
                     .set(Math.abs(velocity.x), Math.abs(velocity.y))
