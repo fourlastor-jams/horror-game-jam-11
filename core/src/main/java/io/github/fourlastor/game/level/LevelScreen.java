@@ -60,6 +60,9 @@ public class LevelScreen extends ScreenAdapter {
         for (Entity tile : factory.ladders()) {
             engine.addEntity(tile);
         }
+        for (Entity entity : factory.pages()) {
+            engine.addEntity(entity);
+        }
         engine.addEntity(factory.character());
         input.addProcessor(restartOnR);
     }
