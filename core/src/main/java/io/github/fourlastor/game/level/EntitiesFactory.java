@@ -53,6 +53,7 @@ public class EntitiesFactory {
     private static final int TILE_SIZE = 16;
     private static final Comparator<Rectangle> RECTANGLE_COMPARATOR = (a, b) -> (int) (a.y - b.y);
     private static final Color LADDER_COLOR = new Color(0x3c5e8b);
+    private static final Color PAGE_COLOR = new Color(0xe8c170ff);
     private final AssetManager assetManager;
     private final TextureAtlas atlas;
     private final LdtkDefinitions definitions;
@@ -288,17 +289,42 @@ public class EntitiesFactory {
     }
 
     public List<Entity> ladders() {
+        Drawable bluePixel = new TextureRegionDrawable(atlas.findRegion("whitePixel")).tint(LADDER_COLOR);
         ArrayList<Entity> entities = new ArrayList<>();
         LdtkLayerInstance entityLayer = entityLayer();
         for (LdtkEntityInstance instance : entityLayer.entityInstances) {
             if ("Ladder".equals(instance.identifier)) {
                 Entity entity = new Entity();
-                Drawable bluePixel = new TextureRegionDrawable(atlas.findRegion("whitePixel")).tint(LADDER_COLOR);
                 Image image = new Image(bluePixel);
                 image.setSize(instance.width, instance.height);
                 entity.add(new FollowBodyComponent());
                 entity.add(new SensorBodyComponent());
                 entity.add(new AreaComponent(Area.LADDER));
+                entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
+                entity.add(new TransformComponent(new Transform(new Rectangle(
+                        instance.x(),
+                        instance.y(entityLayer.cHei, entityLayer.gridSize) + TILE_SIZE,
+                        instance.width,
+                        instance.height))));
+
+                entities.add(entity);
+            }
+        }
+        return entities;
+    }
+
+    public List<Entity> pages() {
+        Drawable yellowPixel = new TextureRegionDrawable(atlas.findRegion("whitePixel")).tint(PAGE_COLOR);
+        ArrayList<Entity> entities = new ArrayList<>();
+        LdtkLayerInstance entityLayer = entityLayer();
+        for (LdtkEntityInstance instance : entityLayer.entityInstances) {
+            if ("Page".equals(instance.identifier)) {
+                Entity entity = new Entity();
+                Image image = new Image(yellowPixel);
+                image.setSize(instance.width, instance.height);
+                entity.add(new FollowBodyComponent());
+                entity.add(new SensorBodyComponent());
+                entity.add(new AreaComponent(Area.PAGE));
                 entity.add(new ActorComponent(image, ActorComponent.Layer.BG_PARALLAX));
                 entity.add(new TransformComponent(new Transform(new Rectangle(
                         instance.x(),

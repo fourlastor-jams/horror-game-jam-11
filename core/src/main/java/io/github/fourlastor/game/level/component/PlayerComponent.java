@@ -29,6 +29,7 @@ public class PlayerComponent implements Component {
 
     public float movementTime = 0;
     public Area area = Area.NONE;
+    public int pages = 0;
 
     public PlayerComponent(
             Controls controls,
